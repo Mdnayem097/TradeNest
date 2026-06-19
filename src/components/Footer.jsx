@@ -1,8 +1,15 @@
+"use client"
+
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { FiFacebook, FiTwitter, FiInstagram, FiLinkedin } from "react-icons/fi";
 
 export default function Footer() {
+  const pathname = usePathname();
+  if(pathname.includes('dashboard')){
+    return null;
+  }
   return (
     <footer className="bg-slate-950 text-slate-300">
       <div className="mx-auto max-w-7xl px-4 py-16">

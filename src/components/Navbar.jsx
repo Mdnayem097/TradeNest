@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation"; // একটিভ রুট ট্র্যাক করার জন্য ইমপোর্ট করা হয়েছে
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { FiMenu, FiX, FiMoon, FiSun, FiHeart, FiUser } from "react-icons/fi";
 import { authClient } from "@/lib/auth-client";
 
 export default function Navbar() {
-  const pathname = usePathname(); // বর্তমান পেজের পাথ/ইউআরএল নেওয়ার জন্য
+  const pathname = usePathname();
   const router = useRouter();
+
   const [mobileMenu, setMobileMenu] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -19,12 +20,13 @@ export default function Navbar() {
   const { data: session } = authClient.useSession();
   const user = session?.user;
 
+  // safe early return (hooks already above)
+  const isDashboard = pathname?.startsWith("/dashboard");
+
   const handleLogout = async () => {
     await authClient.signOut({
       fetchOptions: {
-        onSuccess: () => {
-          router.push("/"); // redirect to login page
-        },
+        onSuccess: () => router.push("/"),
       },
     });
   };
@@ -37,13 +39,9 @@ export default function Navbar() {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // একটিভ লিংকের স্টাইল ডাইনামিক করার জন্য একটি হেল্পার ফাংশন
   const linkStyle = (path) => {
     const isActive = pathname === path;
     return `font-medium transition-colors ${
@@ -52,6 +50,10 @@ export default function Navbar() {
         : "text-slate-700 hover:text-blue-600"
     }`;
   };
+
+  if (isDashboard) {
+    return null;
+  }
 
   return (
     <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-md">
@@ -90,7 +92,7 @@ export default function Navbar() {
 
           {/* Right Side (Actions) */}
           <div className="flex items-center gap-3 md:gap-4">
-            {/* Theme Toggle (সব ডিভাইসের জন্য মেইন ন্যাভবারে রাখা হয়েছে) */}
+            {/* Theme Toggle */}
             <button
               onClick={() => setDarkMode(!darkMode)}
               className="rounded-xl border border-slate-200 p-2 hover:bg-slate-100"
@@ -132,10 +134,12 @@ export default function Navbar() {
                   {/* Profile */}
                   <div ref={dropdownRef} className="relative">
                     <button onClick={() => setProfileOpen(!profileOpen)}>
-                      {user.photoURL ? (
+                      {user.image ? (
                         <Image
-                          src={user.photoURL}
+                          src={user.image}
                           alt="profile"
+                          width={40}
+                          height={40}
                           className="h-10 w-10 rounded-full border object-cover"
                         />
                       ) : (
@@ -152,7 +156,7 @@ export default function Navbar() {
                         </div>
 
                         <Link
-                          href="/dashboard"
+                          href="/dashboard/role"
                           className="block rounded-lg p-3 hover:bg-slate-100"
                         >
                           Dashboard
@@ -182,7 +186,7 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Mobile Menu Button (মেনু বাটনের আগেই থিম টগল থাকবে) */}
+            {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenu(!mobileMenu)}
               className="lg:hidden text-slate-700 p-1"
@@ -197,7 +201,6 @@ export default function Navbar() {
       {mobileMenu && (
         <div className="border-t bg-white lg:hidden">
           <div className="space-y-4 p-4">
-            {/* মোবাইল মেনুর লিংকেও একটিভ ক্লাস যুক্ত করা হয়েছে */}
             <Link
               href="/"
               className={`block ${pathname === "/" ? "text-blue-600 font-semibold" : ""}`}
