@@ -3,16 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import {
-  FiUser,
-  FiMail,
-  FiLock,
-  FiEye,
-  FiEyeOff,
-} from "react-icons/fi";
+import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
+import { authClient } from "@/lib/auth-client";
 
 export default function RegisterPage() {
+  const [role, setRole] = useState("buyer");
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
 
@@ -20,10 +17,9 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] =
-    useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -31,17 +27,20 @@ export default function RegisterPage() {
       return;
     }
 
-    console.log({
-      username,
+    const { data, error } = await authClient.signUp.email({
+      name: username,
       email,
       password,
+      role,
+      plan: "free"
     });
+
+    console.log(error, data)
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 px-4 py-10 flex items-center justify-center">
       <div className="w-full max-w-md rounded-3xl border border-slate-200/80 bg-white/90 backdrop-blur-xl px-8 py-10 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
-
         {/* Logo */}
         <div className="text-center mb-10">
           <Image
@@ -62,10 +61,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-5"
-        >
+        <form onSubmit={handleSubmit} className="space-y-5">
           {/* Username */}
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -83,9 +79,7 @@ export default function RegisterPage() {
               <input
                 type="text"
                 value={username}
-                onChange={(e) =>
-                  setUsername(e.target.value)
-                }
+                onChange={(e) => setUsername(e.target.value)}
                 placeholder="Username"
                 required
                 className={`w-full rounded-xl border border-slate-300 py-3 ${
@@ -112,9 +106,7 @@ export default function RegisterPage() {
               <input
                 type="email"
                 value={email}
-                onChange={(e) =>
-                  setEmail(e.target.value)
-                }
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email Address"
                 required
                 className={`w-full rounded-xl border border-slate-300 py-3 ${
@@ -141,9 +133,7 @@ export default function RegisterPage() {
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) =>
-                  setPassword(e.target.value)
-                }
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
                 required
                 className={`w-full rounded-xl border border-slate-300 py-3 ${
@@ -153,16 +143,10 @@ export default function RegisterPage() {
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowPassword(!showPassword)
-                }
+                onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"
               >
-                {showPassword ? (
-                  <FiEyeOff size={18} />
-                ) : (
-                  <FiEye size={18} />
-                )}
+                {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
               </button>
             </div>
           </div>
@@ -182,33 +166,19 @@ export default function RegisterPage() {
               )}
 
               <input
-                type={
-                  showConfirmPassword
-                    ? "text"
-                    : "password"
-                }
+                type={showConfirmPassword ? "text" : "password"}
                 value={confirmPassword}
-                onChange={(e) =>
-                  setConfirmPassword(
-                    e.target.value
-                  )
-                }
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm Password"
                 required
                 className={`w-full rounded-xl border border-slate-300 py-3 ${
-                  !confirmPassword
-                    ? "pl-11"
-                    : "pl-4"
+                  !confirmPassword ? "pl-11" : "pl-4"
                 } pr-12 outline-none transition-all duration-300 focus:border-[#3B82F6] focus:ring-4 focus:ring-blue-100`}
               />
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowConfirmPassword(
-                    !showConfirmPassword
-                  )
-                }
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"
               >
                 {showConfirmPassword ? (
@@ -216,6 +186,39 @@ export default function RegisterPage() {
                 ) : (
                   <FiEye size={18} />
                 )}
+              </button>
+            </div>
+          </div>
+
+          {/* Role Selection */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              Select Role
+            </label>
+
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setRole("buyer")}
+                className={`rounded-xl border py-3 font-medium transition-all duration-300 ${
+                  role === "buyer"
+                    ? "border-[#3B82F6] bg-blue-50 text-[#3B82F6]"
+                    : "border-slate-300 text-slate-600 hover:border-slate-400"
+                }`}
+              >
+                Buyer
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setRole("seller")}
+                className={`rounded-xl border py-3 font-medium transition-all duration-300 ${
+                  role === "seller"
+                    ? "border-[#3B82F6] bg-blue-50 text-[#3B82F6]"
+                    : "border-slate-300 text-slate-600 hover:border-slate-400"
+                }`}
+              >
+                Seller
               </button>
             </div>
           </div>
@@ -233,9 +236,7 @@ export default function RegisterPage() {
         <div className="my-7 flex items-center">
           <div className="flex-1 border-t border-slate-200"></div>
 
-          <span className="px-4 text-sm text-slate-400">
-            OR
-          </span>
+          <span className="px-4 text-sm text-slate-400">OR</span>
 
           <div className="flex-1 border-t border-slate-200"></div>
         </div>

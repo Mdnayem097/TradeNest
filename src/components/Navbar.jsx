@@ -2,44 +2,36 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation"; // একটিভ রুট ট্র্যাক করার জন্য ইমপোর্ট করা হয়েছে
+import { usePathname, useRouter } from "next/navigation"; // একটিভ রুট ট্র্যাক করার জন্য ইমপোর্ট করা হয়েছে
 import { useState, useEffect, useRef } from "react";
-import {
-  FiMenu,
-  FiX,
-  FiMoon,
-  FiSun,
-  FiHeart,
-  FiUser,
-} from "react-icons/fi";
+import { FiMenu, FiX, FiMoon, FiSun, FiHeart, FiUser } from "react-icons/fi";
+import { authClient } from "@/lib/auth-client";
 
 export default function Navbar() {
   const pathname = usePathname(); // বর্তমান পেজের পাথ/ইউআরএল নেওয়ার জন্য
+  const router = useRouter();
   const [mobileMenu, setMobileMenu] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
   const dropdownRef = useRef(null);
 
-  // Default Logout State
-  const user = null;
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
 
-  // Login Example
-  // const user = {
-  //   displayName: "MD Nayem",
-  //   photoURL: "https://i.pravatar.cc/150?img=12",
-  // };
-
-  const handleLogout = () => {
-    console.log("Logout");
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/"); // redirect to login page
+        },
+      },
+    });
   };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setProfileOpen(false);
       }
     };
@@ -47,10 +39,7 @@ export default function Navbar() {
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside
-      );
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -58,7 +47,9 @@ export default function Navbar() {
   const linkStyle = (path) => {
     const isActive = pathname === path;
     return `font-medium transition-colors ${
-      isActive ? "text-blue-600 font-semibold" : "text-slate-700 hover:text-blue-600"
+      isActive
+        ? "text-blue-600 font-semibold"
+        : "text-slate-700 hover:text-blue-600"
     }`;
   };
 
@@ -66,7 +57,6 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-md">
       <div className="mx-auto max-w-7xl px-4">
         <div className="flex h-16 items-center justify-between">
-          
           {/* Logo Section */}
           <Link href="/" className="relative block h-10 w-36 md:w-40">
             <Image
@@ -100,7 +90,6 @@ export default function Navbar() {
 
           {/* Right Side (Actions) */}
           <div className="flex items-center gap-3 md:gap-4">
-            
             {/* Theme Toggle (সব ডিভাইসের জন্য মেইন ন্যাভবারে রাখা হয়েছে) */}
             <button
               onClick={() => setDarkMode(!darkMode)}
@@ -159,16 +148,25 @@ export default function Navbar() {
                     {profileOpen && (
                       <div className="absolute right-0 mt-3 w-64 rounded-2xl border bg-white p-2 shadow-xl">
                         <div className="border-b p-3">
-                          <h3 className="font-semibold">{user.displayName}</h3>
+                          <h3 className="font-semibold">{user.name}</h3>
                         </div>
 
-                        <Link href="/dashboard" className="block rounded-lg p-3 hover:bg-slate-100">
+                        <Link
+                          href="/dashboard"
+                          className="block rounded-lg p-3 hover:bg-slate-100"
+                        >
                           Dashboard
                         </Link>
-                        <Link href="/wishlist" className="block rounded-lg p-3 hover:bg-slate-100">
+                        <Link
+                          href="/wishlist"
+                          className="block rounded-lg p-3 hover:bg-slate-100"
+                        >
                           Wishlist
                         </Link>
-                        <Link href="/profile" className="block rounded-lg p-3 hover:bg-slate-100">
+                        <Link
+                          href="/profile"
+                          className="block rounded-lg p-3 hover:bg-slate-100"
+                        >
                           Profile Settings
                         </Link>
                         <button
@@ -200,19 +198,34 @@ export default function Navbar() {
         <div className="border-t bg-white lg:hidden">
           <div className="space-y-4 p-4">
             {/* মোবাইল মেনুর লিংকেও একটিভ ক্লাস যুক্ত করা হয়েছে */}
-            <Link href="/" className={`block ${pathname === "/" ? "text-blue-600 font-semibold" : ""}`}>
+            <Link
+              href="/"
+              className={`block ${pathname === "/" ? "text-blue-600 font-semibold" : ""}`}
+            >
               Home
             </Link>
-            <Link href="/products" className={`block ${pathname === "/products" ? "text-blue-600 font-semibold" : ""}`}>
+            <Link
+              href="/products"
+              className={`block ${pathname === "/products" ? "text-blue-600 font-semibold" : ""}`}
+            >
               Products
             </Link>
-            <Link href="/categories" className={`block ${pathname === "/categories" ? "text-blue-600 font-semibold" : ""}`}>
+            <Link
+              href="/categories"
+              className={`block ${pathname === "/categories" ? "text-blue-600 font-semibold" : ""}`}
+            >
               Categories
             </Link>
-            <Link href="/about" className={`block ${pathname === "/about" ? "text-blue-600 font-semibold" : ""}`}>
+            <Link
+              href="/about"
+              className={`block ${pathname === "/about" ? "text-blue-600 font-semibold" : ""}`}
+            >
               About
             </Link>
-            <Link href="/contact" className={`block ${pathname === "/contact" ? "text-blue-600 font-semibold" : ""}`}>
+            <Link
+              href="/contact"
+              className={`block ${pathname === "/contact" ? "text-blue-600 font-semibold" : ""}`}
+            >
               Contact
             </Link>
 
@@ -221,16 +234,25 @@ export default function Navbar() {
                 <Link href="/login" className="rounded-xl border px-4 py-2">
                   Sign In
                 </Link>
-                <Link href="/register" className="rounded-xl bg-blue-600 px-4 py-2 text-white">
+                <Link
+                  href="/register"
+                  className="rounded-xl bg-blue-600 px-4 py-2 text-white"
+                >
                   Get Started
                 </Link>
               </div>
             ) : (
               <div className="space-y-3 border-t pt-3">
                 <div className="font-semibold">{user.displayName}</div>
-                <Link href="/dashboard" className="block">Dashboard</Link>
-                <Link href="/wishlist" className="block">Wishlist</Link>
-                <Link href="/profile" className="block">Profile Settings</Link>
+                <Link href="/dashboard" className="block">
+                  Dashboard
+                </Link>
+                <Link href="/wishlist" className="block">
+                  Wishlist
+                </Link>
+                <Link href="/profile" className="block">
+                  Profile Settings
+                </Link>
                 <button onClick={handleLogout} className="text-red-500">
                   Logout
                 </button>

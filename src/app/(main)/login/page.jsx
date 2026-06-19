@@ -3,35 +3,35 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import {
-  FiMail,
-  FiLock,
-  FiEye,
-  FiEyeOff,
-} from "react-icons/fi";
+import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
+import { authClient } from "@/lib/auth-client";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] =
-    useState("");
+  const [password, setPassword] = useState("");
 
-  const [showPassword, setShowPassword] =
-    useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     console.log({
       email,
       password,
     });
+
+    const { data, error } = await authClient.signIn.email({
+      email,
+      password,
+      callbackURL: "/",
+    });
+    console.log(data, error)
   };
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-16 lg:py-24 flex items-center justify-center">
       <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-10 shadow-lg">
-
         {/* Logo */}
         <div className="mb-8 text-center">
           <Image
@@ -52,10 +52,7 @@ export default function LoginPage() {
         </div>
 
         {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-5"
-        >
+        <form onSubmit={handleSubmit} className="space-y-5">
           {/* Email */}
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -71,9 +68,7 @@ export default function LoginPage() {
               <input
                 type="email"
                 value={email}
-                onChange={(e) =>
-                  setEmail(e.target.value)
-                }
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
                 className="w-full rounded-xl border border-slate-300 py-3 pl-11 pr-4 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
@@ -94,15 +89,9 @@ export default function LoginPage() {
               />
 
               <input
-                type={
-                  showPassword
-                    ? "text"
-                    : "password"
-                }
+                type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) =>
-                  setPassword(e.target.value)
-                }
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 required
                 className="w-full rounded-xl border border-slate-300 py-3 pl-11 pr-12 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
@@ -110,16 +99,10 @@ export default function LoginPage() {
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowPassword(!showPassword)
-                }
+                onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"
               >
-                {showPassword ? (
-                  <FiEyeOff size={18} />
-                ) : (
-                  <FiEye size={18} />
-                )}
+                {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
               </button>
             </div>
           </div>
@@ -147,9 +130,7 @@ export default function LoginPage() {
         <div className="my-6 flex items-center">
           <div className="flex-1 border-t border-slate-200"></div>
 
-          <span className="px-4 text-sm text-slate-400">
-            OR
-          </span>
+          <span className="px-4 text-sm text-slate-400">OR</span>
 
           <div className="flex-1 border-t border-slate-200"></div>
         </div>
@@ -173,7 +154,6 @@ export default function LoginPage() {
             Sign Up
           </Link>
         </p>
-
       </div>
     </div>
   );
