@@ -92,13 +92,6 @@ export default function Navbar() {
 
           {/* Right Side (Actions) */}
           <div className="flex items-center gap-3 md:gap-4">
-            {/* Theme Toggle */}
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="rounded-xl border border-slate-200 p-2 hover:bg-slate-100"
-            >
-              {darkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
-            </button>
 
             {/* Desktop-only Auth/Profile Section */}
             <div className="hidden lg:flex items-center gap-4">
@@ -130,7 +123,7 @@ export default function Navbar() {
                           alt="profile"
                           width={40}
                           height={40}
-                          className="h-10 w-10 rounded-full border object-cover"
+                          className="h-10 w-10 rounded-full border object-cover cursor-pointer"
                         />
                       ) : (
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200">
@@ -233,9 +226,6 @@ export default function Navbar() {
                 <div className="font-semibold">{user.displayName}</div>
                 <Link href={`/dashboard/${user.role}`} className="block">
                   Dashboard
-                </Link>
-                <Link href="/wishlist" className="block">
-                  Wishlist
                 </Link>
                 <Link href="/profile" className="block">
                   Profile Settings

@@ -6,115 +6,140 @@ export default function SalesAnalyticsPage() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    // Fake Data (later replace with API)
-    const fakeData = {
-      monthlySales: [
-        { month: "Jan", sales: 12000 },
-        { month: "Feb", sales: 18000 },
-        { month: "Mar", sales: 14000 },
-        { month: "Apr", sales: 22000 },
-        { month: "May", sales: 30000 },
-        { month: "Jun", sales: 25000 },
-      ],
-
-      topProducts: [
-        { name: "T-Shirt", sales: 120 },
-        { name: "Shoes", sales: 90 },
-        { name: "Watch", sales: 70 },
-        { name: "Bag", sales: 60 },
-        { name: "Jacket", sales: 50 },
-      ],
-
+    setData({
       stats: {
         totalSales: 540,
         revenue: 121000,
         growth: 18,
+        pending: 12,
       },
-    };
 
-    setData(fakeData);
+      monthlySales: [
+        { month: "Jan", value: 20 },
+        { month: "Feb", value: 35 },
+        { month: "Mar", value: 25 },
+        { month: "Apr", value: 50 },
+        { month: "May", value: 70 },
+        { month: "Jun", value: 55 },
+      ],
+
+      topProducts: [
+        { name: "Premium T-Shirt", sales: 120, revenue: 24000 },
+        { name: "Running Shoes", sales: 90, revenue: 54000 },
+        { name: "Smart Watch", sales: 70, revenue: 35000 },
+        { name: "Backpack", sales: 60, revenue: 18000 },
+      ],
+    });
   }, []);
 
   if (!data) {
     return (
-      <div className="flex h-[60vh] items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+      <div className="h-screen flex items-center justify-center bg-slate-50">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 p-6">
+    <div className="min-h-screen bg-[#f6f7fb] p-6">
 
       {/* HEADER */}
-      <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
-        <h1 className="text-3xl font-bold">Sales Analytics</h1>
-        <p className="opacity-80">
-          Visual representation of seller performance
+      <div className="rounded-3xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 p-8 text-white shadow-xl">
+        <h1 className="text-4xl font-bold tracking-tight">
+          Sales Analytics
+        </h1>
+        <p className="mt-2 text-white/80">
+          Real-time performance dashboard overview
         </p>
       </div>
 
-      {/* STATS CARDS */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
-          <p className="text-gray-500">Total Sales</p>
-          <h2 className="text-2xl font-bold">{data.stats.totalSales}</h2>
-        </div>
+      {/* STATS GRID */}
+      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
 
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
-          <p className="text-gray-500">Revenue</p>
-          <h2 className="text-2xl font-bold">৳ {data.stats.revenue}</h2>
-        </div>
+        {[
+          { label: "Total Sales", value: data.stats.totalSales },
+          { label: "Revenue", value: `৳${data.stats.revenue}` },
+          { label: "Growth", value: `+${data.stats.growth}%` },
+          { label: "Pending Orders", value: data.stats.pending },
+        ].map((item, i) => (
+          <div
+            key={i}
+            className="group rounded-2xl bg-white p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100"
+          >
+            <p className="text-sm text-slate-500">{item.label}</p>
 
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
-          <p className="text-gray-500">Growth</p>
-          <h2 className="text-2xl font-bold text-green-600">
-            +{data.stats.growth}%
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
+              {item.value}
+            </h2>
+
+            <div className="mt-4 h-1 w-full rounded-full bg-slate-100 overflow-hidden">
+              <div className="h-full w-1/2 bg-gradient-to-r from-indigo-500 to-purple-500 group-hover:w-full transition-all duration-500" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* MAIN SECTION */}
+      <div className="mt-10 grid gap-6 lg:grid-cols-3">
+
+        {/* MONTHLY SALES */}
+        <div className="lg:col-span-2 rounded-3xl bg-white p-6 shadow-sm border border-slate-100">
+          <h2 className="text-xl font-semibold text-slate-800 mb-6">
+            Monthly Sales Trend
           </h2>
-        </div>
-      </div>
 
-      {/* SALES CHART */}
-      <div className="rounded-2xl border bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold">Monthly Sales Trend</h2>
+          <div className="space-y-5">
+            {data.monthlySales.map((m, i) => (
+              <div key={i} className="flex items-center gap-4">
 
-        <div className="space-y-3">
-          {data.monthlySales.map((item) => (
-            <div key={item.month} className="flex items-center gap-4">
-              <span className="w-10 text-sm">{item.month}</span>
+                <span className="w-10 text-sm text-slate-500">
+                  {m.month}
+                </span>
 
-              <div className="h-3 flex-1 rounded-full bg-gray-200">
-                <div
-                  className="h-3 rounded-full bg-blue-500"
-                  style={{ width: `${item.sales / 300}%` }}
-                />
+                <div className="flex-1 h-3 rounded-full bg-slate-100 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-500"
+                    style={{ width: `${m.value * 1.2}%` }}
+                  />
+                </div>
+
+                <span className="w-10 text-right text-sm font-medium text-slate-700">
+                  {m.value}
+                </span>
+
               </div>
-
-              <span className="w-20 text-right text-sm">
-                ৳ {item.sales}
-              </span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* TOP PRODUCTS */}
-      <div className="rounded-2xl border bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold">Top Selling Products</h2>
+        {/* TOP PRODUCTS */}
+        <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-100">
+          <h2 className="text-xl font-semibold text-slate-800 mb-6">
+            Top Products
+          </h2>
 
-        <div className="space-y-4">
-          {data.topProducts.map((product) => (
-            <div
-              key={product.name}
-              className="flex items-center justify-between rounded-xl bg-gray-50 p-4"
-            >
-              <span className="font-medium">{product.name}</span>
-              <span className="font-semibold text-blue-600">
-                {product.sales} sales
-              </span>
-            </div>
-          ))}
+          <div className="space-y-4">
+            {data.topProducts.map((p, i) => (
+              <div
+                key={i}
+                className="rounded-2xl bg-gradient-to-r from-slate-50 to-white p-4 border border-slate-100 hover:shadow-md transition"
+              >
+                <h3 className="font-semibold text-slate-800">
+                  {p.name}
+                </h3>
+
+                <p className="text-sm text-slate-500 mt-1">
+                  Sales: <span className="font-medium">{p.sales}</span>
+                </p>
+
+                <p className="text-sm text-indigo-600 font-medium mt-1">
+                  ৳ {p.revenue}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
+
       </div>
     </div>
   );
