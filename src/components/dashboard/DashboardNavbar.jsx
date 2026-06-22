@@ -2,8 +2,8 @@ import React from 'react';
 
 const DashboardNavbar = () => {
     return (
-        <div>
-            Navbarr
+        <div className='text-2xl font-bold'>
+            Dashboard
         </div>
     );
 };

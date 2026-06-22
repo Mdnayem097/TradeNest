@@ -156,16 +156,10 @@ export default function Navbar() {
                         </div>
 
                         <Link
-                          href="/dashboard/role"
+                          href={`/dashboard/${user.role}`}
                           className="block rounded-lg p-3 hover:bg-slate-100"
                         >
                           Dashboard
-                        </Link>
-                        <Link
-                          href="/wishlist"
-                          className="block rounded-lg p-3 hover:bg-slate-100"
-                        >
-                          Wishlist
                         </Link>
                         <Link
                           href="/profile"
@@ -247,7 +241,7 @@ export default function Navbar() {
             ) : (
               <div className="space-y-3 border-t pt-3">
                 <div className="font-semibold">{user.displayName}</div>
-                <Link href="/dashboard" className="block">
+                <Link href={`/dashboard/${user.role}`} className="block">
                   Dashboard
                 </Link>
                 <Link href="/wishlist" className="block">

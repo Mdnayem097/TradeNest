@@ -16,6 +16,7 @@ export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [location, setLocation] = useState("");
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -39,6 +40,7 @@ export default function RegisterPage() {
       const { data, error } = await authClient.signUp.email({
         name: username,
         email,
+        location,
         image: imageUrl,
         password,
         role,
@@ -66,7 +68,6 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 px-4 py-10 flex items-center justify-center">
       <div className="w-full max-w-md rounded-3xl border border-slate-200/80 bg-white/90 backdrop-blur-xl px-8 py-10 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
-
         {/* Logo */}
         <div className="text-center mb-10">
           <Image
@@ -88,7 +89,6 @@ export default function RegisterPage() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
-
           {/* Username */}
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -132,6 +132,30 @@ export default function RegisterPage() {
                 required
                 className={`w-full rounded-xl border border-slate-300 py-3 ${
                   !email ? "pl-11" : "pl-4"
+                } pr-4 outline-none focus:border-[#3B82F6] focus:ring-4 focus:ring-blue-100`}
+              />
+            </div>
+          </div>
+
+          {/* Location */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              Your Location
+            </label>
+
+            <div className="relative">
+              {!location && (
+                <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+              )}
+
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Enter your location"
+                required
+                className={`w-full rounded-xl border border-slate-300 py-3 ${
+                  !location ? "pl-11" : "pl-4"
                 } pr-4 outline-none focus:border-[#3B82F6] focus:ring-4 focus:ring-blue-100`}
               />
             </div>
@@ -260,6 +284,19 @@ export default function RegisterPage() {
             {loading ? "Creating..." : "Create Account"}
           </button>
         </form>
+
+        {/* OR Divider */}
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-slate-400"></div>
+          </div>
+
+          <div className="relative flex justify-center">
+            <span className="bg-white px-4 text-sm font-medium text-slate-500">
+              OR
+            </span>
+          </div>
+        </div>
 
         {/* Google */}
         <div className="mt-6">

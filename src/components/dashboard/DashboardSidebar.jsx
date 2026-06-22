@@ -22,60 +22,50 @@ const DashboardSidebar = ({ user }) => {
     buyer: [
       {
         title: "Overview",
-        path: "/dashboard",
+        path: "/dashboard/buyer",
         icon: FiGrid,
       },
       {
         title: "My Orders",
-        path: "/dashboard/my-orders",
+        path: "/dashboard/buyer/my-orders",
         icon: FiPackage,
       },
       {
-        title: "Wishlist",
-        path: "/dashboard/wishlist",
-        icon: FiHeart,
-      },
-      {
         title: "Payment History",
-        path: "/dashboard/payments",
+        path: "/dashboard/buyer/payments",
         icon: FiCreditCard,
-      },
-      {
-        title: "Profile",
-        path: "/dashboard/profile",
-        icon: FiUser,
       },
     ],
 
     seller: [
       {
         title: "Dashboard Overview",
-        path: "/dashboard",
+        path: "/dashboard/seller",
         icon: FiGrid,
       },
       {
         title: "Display Cards",
-        path: "/dashboard/display-cards",
+        path: "/dashboard/seller/display-cards",
         icon: FiGrid,
       },
       {
         title: "Add Product",
-        path: "/dashboard/add-product",
+        path: "/dashboard/seller/add-product",
         icon: FiPlusCircle,
       },
       {
         title: "My Products",
-        path: "/dashboard/my-products",
+        path: "/dashboard/seller/my-products",
         icon: FiShoppingBag,
       },
       {
         title: "Manage Orders",
-        path: "/dashboard/manage-orders",
+        path: "/dashboard/seller/manage-orders",
         icon: FiPackage,
       },
       {
         title: "Sales Analytics",
-        path: "/dashboard/analytics",
+        path: "/dashboard/seller/analytics",
         icon: FiBarChart2,
       },
     ],
@@ -83,27 +73,27 @@ const DashboardSidebar = ({ user }) => {
     admin: [
       {
         title: "Dashboard Overview",
-        path: "/dashboard",
+        path: "/dashboard/admin",
         icon: FiGrid,
       },
       {
         title: "Manage Users",
-        path: "/dashboard/users",
+        path: "/dashboard/admin/users",
         icon: FiUsers,
       },
       {
         title: "Manage Products",
-        path: "/dashboard/products",
+        path: "/dashboard/admin/products",
         icon: FiShoppingBag,
       },
       {
         title: "Manage Orders",
-        path: "/dashboard/orders",
+        path: "/dashboard/admin/orders",
         icon: FiPackage,
       },
       {
         title: "Platform Analytics",
-        path: "/dashboard/platform-analytics",
+        path: "/dashboard/admin/platform-analytics",
         icon: FiBarChart2,
       },
     ],
@@ -152,7 +142,7 @@ const DashboardSidebar = ({ user }) => {
       </div>
 
       {/* Navigation */}
-      <div className="mt-6 flex flex-col gap-2">
+      <div className="my-6 flex flex-col gap-2">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.path;
