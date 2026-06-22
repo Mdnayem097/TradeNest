@@ -31,6 +31,11 @@ const DashboardSidebar = ({ user }) => {
         icon: FiPackage,
       },
       {
+        title: "Wishlist",
+        path: "/dashboard/buyer/Wishlist",
+        icon: FiHeart,
+      },
+      {
         title: "Payment History",
         path: "/dashboard/buyer/payments",
         icon: FiCreditCard,

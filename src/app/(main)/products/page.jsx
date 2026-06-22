@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FiSearch, FiGrid, FiPackage, FiHeart } from "react-icons/fi";
+import { authClient } from "@/lib/auth-client";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -31,12 +32,41 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
-  const handleWishlist = (id) => {
-    setWishlist((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
-    );
-  };
+  const handleWishlist = async (product) => {
+    const session = await authClient.getSession();
+    const buyerEmail = session?.data?.user?.email;
 
+    if (!buyerEmail) {
+      alert("Please login first");
+      return;
+    }
+    setWishlist((prev) =>
+      prev.includes(product._id)
+        ? prev.filter((item) => item !== product._id)
+        : [...prev, product._id],
+    );
+
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/wishlist`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId: product._id,
+          title: product.title,
+          price: product.price,
+          imageUrl: product.imageUrl,
+          description: product.description,
+          category: product.category,
+          condition: product.condition,
+          buyerEmail,
+        }),
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const filteredProducts = useMemo(() => {
     return products.filter((product) =>
       product?.title?.toLowerCase().includes(search.toLowerCase()),
@@ -156,7 +186,7 @@ export default function ProductsPage() {
                   </Link>
 
                   <button
-                    onClick={() => handleWishlist(product._id)}
+                    onClick={() => handleWishlist(product)}
                     className="flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-white transition-all duration-300 hover:border-red-200 hover:bg-red-50"
                   >
                     <FiHeart

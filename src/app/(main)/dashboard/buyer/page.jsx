@@ -3,16 +3,31 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FiShoppingBag, FiHeart, FiClock, FiDollarSign } from "react-icons/fi";
+import { authClient } from "@/lib/auth-client";
 
 export default function BuyerDashboardPage() {
   const [dashboardData, setDashboardData] = useState(null);
+  const [buyerEmail, setBuyerEmail] = useState("");
 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchDashboard = async () => {
+    const loadDashboard = async () => {
       try {
-        const res = await fetch("/api/buyer/dashboard-overview");
+        const session = await authClient.getSession();
+
+        const email = session?.data?.user?.email;
+
+        if (!email) {
+          setLoading(false);
+          return;
+        }
+
+        setBuyerEmail(email);
+
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/buyer/dashboard/${email}`,
+        );
 
         const data = await res.json();
 
@@ -24,7 +39,7 @@ export default function BuyerDashboardPage() {
       }
     };
 
-    fetchDashboard();
+    loadDashboard();
   }, []);
 
   if (loading) {
@@ -102,16 +117,16 @@ export default function BuyerDashboardPage() {
             <div key={item._id} className="rounded-2xl border p-4">
               <div className="relative h-40 w-full">
                 <Image
-                  src={item.image}
-                  alt={item.title}
+                  src={item.productImage || "/placeholder-product.jpg"}
+                  alt={item.productTitle}
                   fill
                   className="rounded-xl object-cover"
                 />
               </div>
 
-              <h3 className="mt-3 font-medium">{item.title}</h3>
+              <h3 className="mt-3 font-medium">{item.productTitle}</h3>
 
-              <p className="mt-1 text-blue-600 font-semibold">৳{item.price}</p>
+              <p className="mt-1 font-semibold text-blue-600">৳{item.price}</p>
             </div>
           ))}
         </div>
@@ -131,7 +146,7 @@ export default function BuyerDashboardPage() {
               >
                 <span>#{order._id}</span>
 
-                <span>৳{order.amount}</span>
+                <span>৳{order.price}</span>
 
                 <span className="rounded-full bg-blue-100 px-3 py-1 text-xs text-blue-700">
                   {order.status}
@@ -152,7 +167,7 @@ export default function BuyerDashboardPage() {
                 className="flex items-center gap-4 rounded-xl bg-slate-50 p-3"
               >
                 <Image
-                  src={item.image}
+                  src={item.imageUrl || "/placeholder-product.jpg"}
                   alt={item.title}
                   width={56}
                   height={56}

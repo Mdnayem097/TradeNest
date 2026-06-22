@@ -120,16 +120,6 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
-                  {/* Wishlist */}
-                  <Link
-                    href="/wishlist"
-                    className="relative rounded-xl border border-slate-200 p-2 hover:bg-slate-100"
-                  >
-                    <FiHeart size={20} />
-                    <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-xs text-white">
-                      3
-                    </span>
-                  </Link>
 
                   {/* Profile */}
                   <div ref={dropdownRef} className="relative">
