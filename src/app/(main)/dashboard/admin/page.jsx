@@ -21,8 +21,7 @@ export default function AdminDashboardOverview() {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        
-        // আপনার ব্যাকএন্ডের অ্যাডমিন ওভারভিউ এপিআই কল করা হচ্ছে
+
         const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/overview`);
         if (response.data?.success) {
           setStats(response.data.data);
@@ -70,7 +69,7 @@ export default function AdminDashboardOverview() {
         </div>
       </div>
 
-      {/* 📊 DISPLAY CARDS SECTION */}
+      {/* DISPLAY CARDS SECTION */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         {/* Card 1: Total Users */}
         <div className="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm flex items-center justify-between hover:shadow-md transition duration-300">
@@ -113,7 +112,7 @@ export default function AdminDashboardOverview() {
         </div>
       </div>
 
-      {/* 📈 ANALYTICS CHART & RECENT TRANSACTIONS */}
+      {/*  ANALYTICS CHART & RECENT TRANSACTIONS */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         
         {/* Graph Line Chart */}
@@ -141,7 +140,7 @@ export default function AdminDashboardOverview() {
           </div>
         </div>
 
-        {/* 📑 RECENT ORDERS TABLE LIST */}
+        {/*  RECENT ORDERS TABLE LIST */}
         <div className="bg-white border border-slate-100 p-5 sm:p-6 rounded-2xl shadow-sm">
           <div className="flex justify-between items-center mb-5 border-b border-slate-50 pb-3">
             <h2 className="font-bold text-slate-800 text-base flex items-center gap-2">

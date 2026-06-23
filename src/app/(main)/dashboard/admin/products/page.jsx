@@ -11,7 +11,7 @@ export default function ManageProductsPage() {
   const [filterStatus, setFilterStatus] = useState("all"); // all, pending, approved, reported
   const [loading, setLoading] = useState(true);
 
- (Read)
+//  (Read)
   const fetchProducts = async () => {
     try {
       setLoading(true);
