@@ -83,7 +83,7 @@ export default function CheckoutPage() {
           <form onSubmit={handleProceedToPayment} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1.5">
-                Receiver's Name
+                Receiver Name
               </label>
               <div className="relative">
                 <FiUser className="absolute left-3 top-3.5 text-slate-400" />

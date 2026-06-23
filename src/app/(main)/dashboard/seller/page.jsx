@@ -67,7 +67,7 @@ export default function SellerDashboardPage() {
       icon: FiDollarSign,
     },
     {
-      title: "Pending Orders",
+      title: "Paid Orders",
       value: dashboardData?.pendingOrders || 0,
       icon: FiClock,
     },

@@ -133,6 +133,7 @@ export default function Navbar() {
                               src={item.imageUrl}
                               fill
                               sizes="48px"
+                              priority
                               className="object-cover"
                               alt={item.title}
                             />
@@ -216,6 +217,7 @@ export default function Navbar() {
                       width={32}
                       height={32}
                       className="rounded-full border border-slate-200 object-cover"
+                      priority
                       alt="Profile"
                     />
                   ) : (

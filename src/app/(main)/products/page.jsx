@@ -152,6 +152,7 @@ export default function ProductsPage() {
                   alt={product.title}
                   fill
                   className="object-cover transition duration-500 group-hover:scale-105"
+                  priority
                 />
 
                 {/* Condition */}

@@ -50,7 +50,7 @@ export default function MyOrdersPage() {
           >
             <div className="flex flex-col gap-5 md:flex-row">
               <Image
-                src={order.productImage}
+                src={order.imageUrl}
                 alt={order.productTitle}
                 width={150}
                 height={150}
@@ -60,7 +60,7 @@ export default function MyOrdersPage() {
               <div className="flex-1">
                 <h2 className="text-xl font-semibold">{order.productTitle}</h2>
 
-                <p className="mt-2 text-slate-500">৳ {order.productPrice}</p>
+                <p className="mt-2 text-slate-500">৳ {order.price}</p>
 
                 <p className="mt-3">
                   Status:

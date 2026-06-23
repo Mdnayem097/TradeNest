@@ -90,7 +90,7 @@ export default function ManageOrdersPage() {
                 <div className="flex gap-4 items-center">
                   <div className="relative h-16 w-16 sm:h-20 sm:w-20 overflow-hidden rounded-xl border">
                     <Image
-                      src={order.productImage || "/placeholder.png"}
+                      src={order.imageUrl || "/placeholder.png"}
                       alt={order.productTitle || "Product"}
                       fill
                       unoptimized
@@ -104,7 +104,7 @@ export default function ManageOrdersPage() {
                     </h2>
 
                     <p className="text-sm text-slate-500">
-                      Name: {order.buyerName}
+                      Name: {order.deliveryInfo.name}
                     </p>
 
                     <p className="text-sm text-slate-500">
@@ -112,7 +112,7 @@ export default function ManageOrdersPage() {
                     </p>
 
                     <p className="text-xs text-slate-400">
-                      Location: {order.location}
+                      Location: {order.deliveryInfo.address}
                     </p>
                   </div>
                 </div>

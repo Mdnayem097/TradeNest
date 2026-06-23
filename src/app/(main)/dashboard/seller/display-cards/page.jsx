@@ -63,7 +63,7 @@ export default function SellerDisplayCards() {
       color: "from-purple-500 to-purple-600",
     },
     {
-      title: "Pending Orders",
+      title: "Paid Orders",
       value: data?.pendingOrders || 0,
       icon: FiClock,
       color: "from-orange-500 to-orange-600",

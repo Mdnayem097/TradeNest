@@ -67,7 +67,7 @@ export default function BuyerDashboardPage() {
       icon: FiDollarSign,
     },
     {
-      title: "Pending Orders",
+      title: "Paid Orders",
       value: dashboardData?.pendingOrders || 0,
       icon: FiClock,
     },
@@ -117,9 +117,11 @@ export default function BuyerDashboardPage() {
             <div key={item._id} className="rounded-2xl border p-4">
               <div className="relative h-40 w-full">
                 <Image
-                  src={item.productImage || "/placeholder-product.jpg"}
-                  alt={item.productTitle}
+                  src={item.imageUrl || "/placeholder-product.jpg"}
+                  alt={item.productTitle || "Product Image"}
                   fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  priority
                   className="rounded-xl object-cover"
                 />
               </div>
