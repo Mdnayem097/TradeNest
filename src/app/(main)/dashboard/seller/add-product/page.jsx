@@ -77,7 +77,7 @@ export default function AddProductPage() {
         sellerEmail: user.email,
         sellerName: user.name,
         sellerId: user.id,
-
+        status: "pending",
         createdAt: new Date(),
       };
 
