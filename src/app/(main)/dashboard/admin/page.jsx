@@ -21,8 +21,9 @@ export default function AdminDashboardOverview() {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
+        
         // আপনার ব্যাকএন্ডের অ্যাডমিন ওভারভিউ এপিআই কল করা হচ্ছে
-        const response = await axios.get("http://localhost:5000/api/admin/overview");
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/overview`);
         if (response.data?.success) {
           setStats(response.data.data);
         } else {
