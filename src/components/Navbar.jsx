@@ -220,13 +220,13 @@ export default function Navbar() {
                           ৳{totalPrice}
                         </span>
                       </div>
-                        <Link
-                          href="/checkout"
-                          onClick={() => setCartOpen(false)}
-                          className="block text-center w-full bg-blue-600 text-white text-xs py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition shadow-sm"
-                        >
-                          Checkout Now
-                        </Link>
+                      <Link
+                        href="/checkout"
+                        onClick={() => setCartOpen(false)}
+                        className="block text-center w-full bg-blue-600 text-white text-xs py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition shadow-sm"
+                      >
+                        Checkout Now
+                      </Link>
                     </div>
                   )}
                 </div>
@@ -282,7 +282,11 @@ export default function Navbar() {
                       </p>
                     </div>
                     <Link
-                      href={`/dashboard/${user.role}`}
+                      href={
+                        user?.role
+                          ? `/dashboard/${user.role}`
+                          : "/dashboard/buyer"
+                      }
                       onClick={() => setProfileOpen(false)}
                       className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
                     >
