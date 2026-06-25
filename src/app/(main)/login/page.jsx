@@ -47,8 +47,6 @@ export default function LoginPage() {
 
       localStorage.setItem("access-token", jwtData.token);
 
-      toast.success("Login successful!");
-
       router.push("/");
 
       if (!error) {
