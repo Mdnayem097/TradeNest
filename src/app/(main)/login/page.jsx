@@ -7,8 +7,10 @@ import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 import { authClient } from "@/lib/auth-client";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -24,8 +26,35 @@ export default function LoginPage() {
       const { data, error } = await authClient.signIn.email({
         email,
         password,
-        callbackURL: "/",
       });
+
+      if (error) {
+        toast.error(error.message || "Login failed!");
+        return;
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/jwt`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+        }),
+      });
+
+      const jwtData = await response.json();
+
+      localStorage.setItem("access-token", jwtData.token);
+
+      toast.success("Login successful!");
+
+      router.push("/");
+
+      if (!error) {
+        router.refresh();
+        router.push("/");
+      }
 
       if (error) {
         toast.error(error.message || "Login failed!");
@@ -82,9 +111,7 @@ export default function LoginPage() {
               <input
                 type="email"
                 value={email}
-                onChange={(e) =>
-                  setEmail(e.target.value)
-                }
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
                 disabled={loading}
@@ -106,15 +133,9 @@ export default function LoginPage() {
               />
 
               <input
-                type={
-                  showPassword
-                    ? "text"
-                    : "password"
-                }
+                type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) =>
-                  setPassword(e.target.value)
-                }
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 required
                 disabled={loading}
@@ -123,18 +144,10 @@ export default function LoginPage() {
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowPassword(
-                    !showPassword
-                  )
-                }
+                onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"
               >
-                {showPassword ? (
-                  <FiEyeOff size={18} />
-                ) : (
-                  <FiEye size={18} />
-                )}
+                {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
               </button>
             </div>
           </div>
@@ -178,7 +191,6 @@ export default function LoginPage() {
                     d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                   ></path>
                 </svg>
-
                 Signing In...
               </>
             ) : (
@@ -191,9 +203,7 @@ export default function LoginPage() {
         <div className="my-6 flex items-center">
           <div className="flex-1 border-t border-slate-200"></div>
 
-          <span className="px-4 text-sm text-slate-400">
-            OR
-          </span>
+          <span className="px-4 text-sm text-slate-400">OR</span>
 
           <div className="flex-1 border-t border-slate-200"></div>
         </div>

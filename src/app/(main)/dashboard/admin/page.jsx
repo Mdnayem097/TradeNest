@@ -20,11 +20,25 @@ export default function AdminDashboardOverview() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
+        const token = localStorage.getItem("access-token");
         setLoading(true);
 
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/overview`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/overview`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         if (response.data?.success) {
-          setStats(response.data.data);
+          // ডেটা সেভ করার আগে নিশ্চিত হয়ে নিন সব প্রোপার্টি ঠিক আছে কিনা
+          setStats({
+            totalUsers: response.data.data?.totalUsers || 0,
+            totalProducts: response.data.data?.totalProducts || 0,
+            totalOrders: response.data.data?.totalOrders || 0,
+            totalRevenue: response.data.data?.totalRevenue || 0,
+            chartData: response.data.data?.chartData || [], // নিশ্চিত করুন এটি অ্যারে
+            recentOrders: response.data.data?.recentOrders || []
+          });
         } else {
           setError("Failed to fetch data.");
         }
@@ -38,6 +52,11 @@ export default function AdminDashboardOverview() {
 
     fetchDashboardData();
   }, []);
+
+  // কনসোলে চেক করার জন্য (সঠিক ডেটা আসছে কিনা দেখার জন্য এটি ব্যবহার করুন)
+  useEffect(() => {
+    console.log("Updated Stats Data:", stats);
+  }, [stats]);
 
   if (loading) {
     return (
@@ -71,7 +90,7 @@ export default function AdminDashboardOverview() {
 
       {/* DISPLAY CARDS SECTION */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-        {/* Card 1: Total Users */}
+        {/* Card 1 */}
         <div className="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm flex items-center justify-between hover:shadow-md transition duration-300">
           <div>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Users</p>
@@ -81,7 +100,7 @@ export default function AdminDashboardOverview() {
           <div className="p-4 bg-blue-50 text-blue-600 rounded-xl"><FiUsers size={24} /></div>
         </div>
 
-        {/* Card 2: Total Products */}
+        {/* Card 2 */}
         <div className="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm flex items-center justify-between hover:shadow-md transition duration-300">
           <div>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Products</p>
@@ -91,7 +110,7 @@ export default function AdminDashboardOverview() {
           <div className="p-4 bg-purple-50 text-purple-600 rounded-xl"><FiLayers size={24} /></div>
         </div>
 
-        {/* Card 3: Total Orders */}
+        {/* Card 3 */}
         <div className="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm flex items-center justify-between hover:shadow-md transition duration-300">
           <div>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Orders</p>
@@ -101,7 +120,7 @@ export default function AdminDashboardOverview() {
           <div className="p-4 bg-amber-50 text-amber-600 rounded-xl"><FiShoppingBag size={24} /></div>
         </div>
 
-        {/* Card 4: Total Revenue */}
+        {/* Card 4 */}
         <div className="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm flex items-center justify-between hover:shadow-md transition duration-300">
           <div>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Revenue</p>
@@ -112,7 +131,7 @@ export default function AdminDashboardOverview() {
         </div>
       </div>
 
-      {/*  ANALYTICS CHART & RECENT TRANSACTIONS */}
+      {/* ANALYTICS CHART & RECENT TRANSACTIONS */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         
         {/* Graph Line Chart */}
@@ -121,26 +140,34 @@ export default function AdminDashboardOverview() {
             <h2 className="font-bold text-slate-800 text-base">Sales Revenue Flow</h2>
             <span className="text-xs text-slate-400">Last 7 Days Data</span>
           </div>
-          <div className="h-72 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={stats.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.2}/>
-                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="day" stroke="#94a3b8" fontSize={12} tickLine={false} />
-                <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} />
-                <Tooltip />
-                <Area type="monotone" dataKey="revenue" stroke="#2563eb" strokeWidth={2.5} fillOpacity={1} fill="url(#colorRevenue)" />
-              </AreaChart>
-            </ResponsiveContainer>
+          
+          {/* যদি চার্ট ডাটা না থাকে তবে মেসেজ দেখাবে, থাকলে চার্ট দেখাবে */}
+          <div className="h-72 w-full relative">
+            {stats.chartData && stats.chartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={stats.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#2563eb" stopOpacity={0.2}/>
+                      <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="day" stroke="#94a3b8" fontSize={12} tickLine={false} />
+                  <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} />
+                  <Tooltip />
+                  <Area type="monotone" dataKey="revenue" stroke="#2563eb" strokeWidth={2.5} fillOpacity={1} fill="url(#colorRevenue)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-full text-slate-400 text-sm">
+                No chart data available or invalid format.
+              </div>
+            )}
           </div>
         </div>
 
-        {/*  RECENT ORDERS TABLE LIST */}
+        {/* RECENT ORDERS TABLE LIST */}
         <div className="bg-white border border-slate-100 p-5 sm:p-6 rounded-2xl shadow-sm">
           <div className="flex justify-between items-center mb-5 border-b border-slate-50 pb-3">
             <h2 className="font-bold text-slate-800 text-base flex items-center gap-2">

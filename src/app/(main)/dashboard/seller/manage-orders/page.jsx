@@ -16,11 +16,15 @@ export default function ManageOrdersPage() {
 
   // ✅ FETCH ORDERS
   const fetchOrders = async (email) => {
+    const token = localStorage.getItem("access-token");
     try {
       setLoading(true);
 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/seller/orders/${email}`,
+        {headers: {
+          Authorization: `Bearer ${token}`,
+        },}
       );
 
       const data = await res.json();
@@ -43,11 +47,15 @@ export default function ManageOrdersPage() {
 
   // ✅ UPDATE STATUS
   const updateStatus = async (id, status) => {
+    const token = localStorage.getItem("access-token");
     try {
       await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/orders/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       fetchOrders(sellerEmail);

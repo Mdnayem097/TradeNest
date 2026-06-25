@@ -1,12 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  FiBox,
-  FiShoppingCart,
-  FiDollarSign,
-  FiClock,
-} from "react-icons/fi";
+import { FiBox, FiShoppingCart, FiDollarSign, FiClock } from "react-icons/fi";
 import { authClient } from "@/lib/auth-client";
 
 export default function SellerDisplayCards() {
@@ -16,11 +11,17 @@ export default function SellerDisplayCards() {
   useEffect(() => {
     const loadData = async () => {
       try {
+        const token = localStorage.getItem("access-token");
         const session = await authClient.getSession();
         const email = session?.data?.user?.email;
 
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/seller/dashboard/display-cards/${email}`
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/seller/dashboard/display-cards/${email}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
         );
 
         const result = await res.json();
@@ -72,12 +73,9 @@ export default function SellerDisplayCards() {
 
   return (
     <div className="p-6 space-y-8">
-
       {/* HEADER */}
       <div className="rounded-3xl bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 p-8 text-white shadow-xl">
-        <h1 className="text-3xl font-bold">
-          Seller Dashboard 🚀
-        </h1>
+        <h1 className="text-3xl font-bold">Seller Dashboard 🚀</h1>
         <p className="mt-2 text-blue-100">
           Track your sales, revenue and performance in real-time
         </p>
@@ -101,9 +99,7 @@ export default function SellerDisplayCards() {
               {/* Content */}
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-500">
-                    {card.title}
-                  </p>
+                  <p className="text-sm text-slate-500">{card.title}</p>
 
                   <h2 className="mt-2 text-2xl font-bold text-slate-900">
                     {card.value}

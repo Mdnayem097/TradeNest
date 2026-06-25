@@ -16,6 +16,7 @@ export default function SellerDashboardPage() {
   useEffect(() => {
     const loadDashboard = async () => {
       try {
+        const token = localStorage.getItem("access-token");
         const session = await authClient.getSession();
 
         const email = session?.data?.user?.email;
@@ -27,6 +28,11 @@ export default function SellerDashboardPage() {
 
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_SERVER_URL}/seller/dashboard/${email}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
         );
 
         const data = await res.json();

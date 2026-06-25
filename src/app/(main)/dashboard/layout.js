@@ -5,6 +5,7 @@ import DashboardNavbar from "@/components/dashboard/DashboardNavbar";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import { useEffect, useState } from "react";
 import { FiMenu, FiX } from "react-icons/fi";
+import PrivateRoute from "@/components/PrivateRoute";
 
 export default function DashboardLayout({
     children,
@@ -28,6 +29,7 @@ export default function DashboardLayout({
     }, []);
 
     return (
+        <PrivateRoute>
         <div className="min-h-screen bg-slate-50">
 
             {/* Mobile Navbar */}
@@ -106,5 +108,6 @@ export default function DashboardLayout({
                 </div>
             </div>
         </div>
+        </PrivateRoute>
     );
 }

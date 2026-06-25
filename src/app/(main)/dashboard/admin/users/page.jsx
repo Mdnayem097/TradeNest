@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FiSearch, FiUserCheck, FiUserX, FiTrash2, FiShield, FiUser } from "react-icons/fi";
+import {
+  FiSearch,
+  FiUserCheck,
+  FiUserX,
+  FiTrash2,
+  FiShield,
+  FiUser,
+} from "react-icons/fi";
 import axios from "axios";
 
 export default function ManageUsersPage() {
@@ -13,7 +20,15 @@ export default function ManageUsersPage() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/users`);
+      const token = localStorage.getItem("access-token");
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/users`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
       if (response.data?.success) {
         setUsers(response.data.users);
       }
@@ -32,13 +47,24 @@ export default function ManageUsersPage() {
   // ২. ইউজারের স্ট্যাটাস বা রোল আপডেট করা (Update Status / Block / Unblock)
   const handleUpdateStatus = async (userId, currentStatus) => {
     const newStatus = currentStatus === "active" ? "blocked" : "active";
-    const confirmAction = window.confirm(`Are you sure you want to ${newStatus} this user?`);
+    const confirmAction = window.confirm(
+      `Are you sure you want to ${newStatus} this user?`,
+    );
     if (!confirmAction) return;
 
     try {
-      const response = await axios.patch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/users/${userId}`, {
-        status: newStatus
-      });
+      const token = localStorage.getItem("access-token");
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/users/${userId}`,
+        {
+          status: newStatus,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
       if (response.data?.success) {
         alert(`User successfully ${newStatus}!`);
         fetchUsers(); // ডাটা রিলোড করা
@@ -56,9 +82,18 @@ export default function ManageUsersPage() {
     if (!confirmAction) return;
 
     try {
-      const response = await axios.patch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/users/${userId}`, {
-        role: newRole
-      });
+      const token = localStorage.getItem("access-token");
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/users/${userId}`,
+        {
+          role: newRole,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
       if (response.data?.success) {
         alert(`Role updated to ${newRole}!`);
         fetchUsers();
@@ -70,11 +105,21 @@ export default function ManageUsersPage() {
 
   // ৪. ইউজার ডিলিট করা (Delete)
   const handleDeleteUser = async (userId) => {
-    const confirmDelete = window.confirm("CRITICAL: Are you sure you want to delete this account permanently?");
+    const confirmDelete = window.confirm(
+      "CRITICAL: Are you sure you want to delete this account permanently?",
+    );
     if (!confirmDelete) return;
 
     try {
-      const response = await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/users/${userId}`);
+      const token = localStorage.getItem("access-token");
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/users/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
       if (response.data?.success) {
         alert("User account deleted permanently.");
         fetchUsers();
@@ -86,9 +131,10 @@ export default function ManageUsersPage() {
   };
 
   // ক্লায়েন্ট সাইড সার্চ ফিল্টারিং
-  const filteredUsers = users.filter((u) =>
-    u.name?.toLowerCase().includes(search.toLowerCase()) ||
-    u.email?.toLowerCase().includes(search.toLowerCase())
+  const filteredUsers = users.filter(
+    (u) =>
+      u.name?.toLowerCase().includes(search.toLowerCase()) ||
+      u.email?.toLowerCase().includes(search.toLowerCase()),
   );
 
   if (loading) {
@@ -104,8 +150,12 @@ export default function ManageUsersPage() {
       {/* HEADER & SEARCH */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight">Manage Users</h1>
-          <p className="text-xs text-slate-500 mt-1">Monitor, authorize, block or remove users from the platform.</p>
+          <h1 className="text-2xl font-black text-slate-800 tracking-tight">
+            Manage Users
+          </h1>
+          <p className="text-xs text-slate-500 mt-1">
+            Monitor, authorize, block or remove users from the platform.
+          </p>
         </div>
 
         {/* Search Bar */}
@@ -136,11 +186,19 @@ export default function ManageUsersPage() {
             <tbody className="divide-y divide-slate-50 text-xs text-slate-700">
               {filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan="4" className="text-center py-12 text-slate-400 font-medium">No users found.</td>
+                  <td
+                    colSpan="4"
+                    className="text-center py-12 text-slate-400 font-medium"
+                  >
+                    No users found.
+                  </td>
                 </tr>
               ) : (
                 filteredUsers.map((user) => (
-                  <tr key={user._id} className="hover:bg-slate-50/50 transition">
+                  <tr
+                    key={user._id}
+                    className="hover:bg-slate-50/50 transition"
+                  >
                     {/* User Info */}
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
@@ -148,8 +206,12 @@ export default function ManageUsersPage() {
                           {user.name ? user.name[0] : <FiUser />}
                         </div>
                         <div>
-                          <h4 className="font-bold text-slate-800">{user.name || "N/A"}</h4>
-                          <p className="text-[11px] text-slate-400 mt-0.5">{user.email}</p>
+                          <h4 className="font-bold text-slate-800">
+                            {user.name || "N/A"}
+                          </h4>
+                          <p className="text-[11px] text-slate-400 mt-0.5">
+                            {user.email}
+                          </p>
                         </div>
                       </div>
                     </td>
@@ -186,15 +248,28 @@ export default function ManageUsersPage() {
                       <div className="flex items-center justify-end gap-2">
                         {/* Block / Unblock Toggle Button */}
                         <button
-                          onClick={() => handleUpdateStatus(user._id, user.status || "active")}
-                          title={user.status === "blocked" ? "Unblock User" : "Block User"}
+                          onClick={() =>
+                            handleUpdateStatus(
+                              user._id,
+                              user.status || "active",
+                            )
+                          }
+                          title={
+                            user.status === "blocked"
+                              ? "Unblock User"
+                              : "Block User"
+                          }
                           className={`p-2 rounded-lg border transition cursor-pointer ${
                             user.status === "blocked"
                               ? "bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100"
                               : "bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-100"
                           }`}
                         >
-                          {user.status === "blocked" ? <FiUserCheck size={14} /> : <FiUserX size={14} />}
+                          {user.status === "blocked" ? (
+                            <FiUserCheck size={14} />
+                          ) : (
+                            <FiUserX size={14} />
+                          )}
                         </button>
 
                         {/* Delete Button */}

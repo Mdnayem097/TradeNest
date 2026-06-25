@@ -20,9 +20,15 @@ export default function ManageOrdersPage() {
   // সব অর্ডার নিয়ে আসা (Read)
   const fetchOrders = async () => {
     try {
+      const token = localStorage.getItem("access-token");
       setLoading(true);
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/orders`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       if (response.data?.success) {
         setOrders(response.data.orders);
@@ -42,11 +48,17 @@ export default function ManageOrdersPage() {
   // অর্ডারের স্ট্যাটাস পরিবর্তন করা (Track & Update Status)
   const handleUpdateStatus = async (orderId, newStatus) => {
     try {
+      const token = localStorage.getItem("access-token");
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/orders/${orderId}`,
         {
           status: newStatus,
         },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       if (response.data?.success) {
         alert(`Order status updated to ${newStatus}`);
@@ -66,12 +78,18 @@ export default function ManageOrdersPage() {
     if (!confirmResolve) return;
 
     try {
+      const token = localStorage.getItem("access-token");
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/orders/${orderId}/resolve`,
         {
           isDisputed: false,
           status: "processing",
         },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       if (response.data?.success) {
         alert("Dispute successfully resolved!");

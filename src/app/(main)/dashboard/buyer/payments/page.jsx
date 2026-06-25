@@ -10,6 +10,7 @@ export default function PaymentHistoryPage() {
   useEffect(() => {
     const loadPayments = async () => {
       try {
+        const token = localStorage.getItem("access-token");
         const session = await authClient.getSession();
 
         const email = session?.data?.user?.email;
@@ -20,7 +21,12 @@ export default function PaymentHistoryPage() {
         }
 
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/payment-history/${email}`
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/payment-history/${email}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
         );
 
         const data = await res.json();
@@ -68,25 +74,14 @@ export default function PaymentHistoryPage() {
 
             <tbody>
               {payments.map((payment) => (
-                <tr
-                  key={payment._id}
-                  className="border-t hover:bg-slate-50"
-                >
-                  <td className="p-4 font-medium">
-                    {payment.txnId || "N/A"}
-                  </td>
+                <tr key={payment._id} className="border-t hover:bg-slate-50">
+                  <td className="p-4 font-medium">{payment.txnId || "N/A"}</td>
 
-                  <td className="p-4">
-                    ৳{payment.price}
-                  </td>
+                  <td className="p-4">৳{payment.price}</td>
 
-                  <td className="p-4 capitalize">
-                    {payment.paymentMethod}
-                  </td>
+                  <td className="p-4 capitalize">{payment.paymentMethod}</td>
 
-                  <td className="p-4">
-                    {payment.createdAt}
-                  </td>
+                  <td className="p-4">{payment.createdAt}</td>
 
                   <td className="p-4">
                     <span
@@ -94,10 +89,10 @@ export default function PaymentHistoryPage() {
                         payment.status === "pending"
                           ? "bg-yellow-100 text-yellow-700"
                           : payment.status === "accepted"
-                          ? "bg-blue-100 text-blue-700"
-                          : payment.status === "delivered"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
+                            ? "bg-blue-100 text-blue-700"
+                            : payment.status === "delivered"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
                       }`}
                     >
                       {payment.status}

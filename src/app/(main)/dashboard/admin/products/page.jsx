@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FiCheckCircle, FiXCircle, FiTrash2, FiAlertTriangle, FiSearch } from "react-icons/fi";
+import {
+  FiCheckCircle,
+  FiXCircle,
+  FiTrash2,
+  FiAlertTriangle,
+  FiSearch,
+} from "react-icons/fi";
 import Image from "next/image";
 import axios from "axios";
 
@@ -11,11 +17,19 @@ export default function ManageProductsPage() {
   const [filterStatus, setFilterStatus] = useState("all"); // all, pending, approved, reported
   const [loading, setLoading] = useState(true);
 
-//  (Read)
+  //  (Read)
   const fetchProducts = async () => {
     try {
+      const token = localStorage.getItem("access-token");
       setLoading(true);
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/products`);
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/products`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
       if (response.data?.success) {
         setProducts(response.data.products);
       }
@@ -33,13 +47,24 @@ export default function ManageProductsPage() {
 
   // (Approve / Reject)
   const handleUpdateStatus = async (productId, status) => {
-    const confirmAction = window.confirm(`Are you sure you want to ${status} this product?`);
+    const confirmAction = window.confirm(
+      `Are you sure you want to ${status} this product?`,
+    );
     if (!confirmAction) return;
 
     try {
-      const response = await axios.patch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/products/${productId}`, {
-        status: status // 'approved' or 'rejected'
-      });
+      const token = localStorage.getItem("access-token");
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/products/${productId}`,
+        {
+          status: status, // 'approved' or 'rejected'
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
       if (response.data?.success) {
         alert(`Product successfully ${status}!`);
         fetchProducts();
@@ -52,11 +77,21 @@ export default function ManageProductsPage() {
 
   //  (Delete)
   const handleDeleteProduct = async (productId) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this product permanently from TradeNest?");
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this product permanently from TradeNest?",
+    );
     if (!confirmDelete) return;
 
     try {
-      const response = await axios.delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/products/${productId}`);
+      const token = localStorage.getItem("access-token");
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/admin/products/${productId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
       if (response.data?.success) {
         alert("Product deleted successfully.");
         fetchProducts();
@@ -69,11 +104,13 @@ export default function ManageProductsPage() {
 
   // সার্চ এবং ফিল্টারিং লজিক
   const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.title?.toLowerCase().includes(search.toLowerCase()) || 
-                          product.sellerEmail?.toLowerCase().includes(search.toLowerCase());
-    
+    const matchesSearch =
+      product.title?.toLowerCase().includes(search.toLowerCase()) ||
+      product.sellerEmail?.toLowerCase().includes(search.toLowerCase());
+
     if (filterStatus === "all") return matchesSearch;
-    if (filterStatus === "reported") return matchesSearch && product.isReported === true;
+    if (filterStatus === "reported")
+      return matchesSearch && product.isReported === true;
     return matchesSearch && product.status === filterStatus;
   });
 
@@ -90,8 +127,13 @@ export default function ManageProductsPage() {
       {/* HEADER SECTION */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight">Manage Products</h1>
-          <p className="text-xs text-slate-500 mt-1">Review, approve, reject, or remove product listings across the platform.</p>
+          <h1 className="text-2xl font-black text-slate-800 tracking-tight">
+            Manage Products
+          </h1>
+          <p className="text-xs text-slate-500 mt-1">
+            Review, approve, reject, or remove product listings across the
+            platform.
+          </p>
         </div>
 
         {/* CONTROLS: SEARCH & FILTER */}
@@ -139,11 +181,19 @@ export default function ManageProductsPage() {
             <tbody className="divide-y divide-slate-50 text-xs text-slate-700">
               {filteredProducts.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="text-center py-12 text-slate-400 font-medium">No products found under this criteria.</td>
+                  <td
+                    colSpan="5"
+                    className="text-center py-12 text-slate-400 font-medium"
+                  >
+                    No products found under this criteria.
+                  </td>
                 </tr>
               ) : (
                 filteredProducts.map((product) => (
-                  <tr key={product._id} className="hover:bg-slate-50/50 transition">
+                  <tr
+                    key={product._id}
+                    className="hover:bg-slate-50/50 transition"
+                  >
                     {/* Product Info with Image Thumbnail */}
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3 min-w-[220px]">
@@ -158,7 +208,10 @@ export default function ManageProductsPage() {
                           />
                         </div>
                         <div className="min-w-0">
-                          <h4 className="font-bold text-slate-800 truncate max-w-[180px]" title={product.title}>
+                          <h4
+                            className="font-bold text-slate-800 truncate max-w-[180px]"
+                            title={product.title}
+                          >
                             {product.title}
                           </h4>
                           <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded uppercase font-medium mt-1 inline-block">
@@ -175,7 +228,10 @@ export default function ManageProductsPage() {
                     </td>
 
                     {/* Seller Info */}
-                    <td className="py-4 px-6 text-slate-500 max-w-[150px] truncate" title={product.sellerEmail}>
+                    <td
+                      className="py-4 px-6 text-slate-500 max-w-[150px] truncate"
+                      title={product.sellerEmail}
+                    >
                       {product.sellerEmail || "Unknown"}
                     </td>
 
@@ -191,8 +247,8 @@ export default function ManageProductsPage() {
                           product.status === "approved"
                             ? "bg-emerald-50 text-emerald-700 border-emerald-100"
                             : product.status === "rejected"
-                            ? "bg-rose-50 text-rose-600 border-rose-100"
-                            : "bg-amber-50 text-amber-700 border-amber-100" // pending review
+                              ? "bg-rose-50 text-rose-600 border-rose-100"
+                              : "bg-amber-50 text-amber-700 border-amber-100" // pending review
                         }`}
                       >
                         {product.status || "pending"}
@@ -205,7 +261,9 @@ export default function ManageProductsPage() {
                         {/* Approve Button */}
                         {product.status !== "approved" && (
                           <button
-                            onClick={() => handleUpdateStatus(product._id, "approved")}
+                            onClick={() =>
+                              handleUpdateStatus(product._id, "approved")
+                            }
                             title="Approve Product Listing"
                             className="p-2 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-xl hover:bg-emerald-100 transition cursor-pointer"
                           >
@@ -216,7 +274,9 @@ export default function ManageProductsPage() {
                         {/* Reject Button */}
                         {product.status !== "rejected" && (
                           <button
-                            onClick={() => handleUpdateStatus(product._id, "rejected")}
+                            onClick={() =>
+                              handleUpdateStatus(product._id, "rejected")
+                            }
                             title="Reject/Disapprove Product"
                             className="p-2 bg-amber-50 text-amber-600 border border-amber-100 hover:bg-amber-100 transition cursor-pointer"
                           >

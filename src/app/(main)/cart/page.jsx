@@ -5,12 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/CartContext";
 import { FiTrash2, FiMinus, FiPlus, FiArrowLeft, FiShoppingCart } from "react-icons/fi";
+import PrivateRoute from "@/components/PrivateRoute";
 
 export default function CartPage() {
   const { cartItems, increaseQty, decreaseQty, removeFromCart, totalPrice } = useCart();
   const router = useRouter();
 
   return (
+    <PrivateRoute>
     <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8 min-h-[calc(100vh-4rem)] flex flex-col justify-between">
       <div>
         {/* HEADER SECTION */}
@@ -148,5 +150,6 @@ export default function CartPage() {
         )}
       </div>
     </div>
+    </PrivateRoute>
   );
 }

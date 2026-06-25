@@ -14,16 +14,25 @@ export default function MyOrdersPage() {
   console.log("Email:", email);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/my-orders/${email}`)
+    const token = localStorage.getItem("access-token");
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/my-orders/${email}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => setOrders(data));
   }, []);
 
   const handleCancel = async (id) => {
+    const token = localStorage.getItem("access-token");
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_URL}/orders/cancel/${id}`,
       {
         method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
     );
 
