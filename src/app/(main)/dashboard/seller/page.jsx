@@ -36,6 +36,7 @@ export default function SellerDashboardPage() {
         );
 
         const data = await res.json();
+        console.log(data)
 
         setDashboardData(data);
       } catch (error) {

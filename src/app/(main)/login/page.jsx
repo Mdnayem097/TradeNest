@@ -70,6 +70,12 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleSubmit = async () => {
+    await authClient.signIn.social({
+    provider: "google",
+  });
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-16 lg:py-24">
       <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-10 shadow-lg">
@@ -210,6 +216,7 @@ export default function LoginPage() {
         <button
           type="button"
           disabled={loading}
+          onClick={handleGoogleSubmit}
           className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 py-3 font-medium transition hover:bg-slate-50"
         >
           <FcGoogle size={22} />
