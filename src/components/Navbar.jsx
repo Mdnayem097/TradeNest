@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import {
   FiMenu,
   FiX,
@@ -86,7 +87,12 @@ export default function Navbar() {
     }`;
 
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-slate-100 shadow-sm">
+    <motion.nav
+      className="sticky top-0 z-50 bg-white border-b border-slate-100 shadow-sm"
+      initial={{ y: -80 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* BRAND LOGO */}
@@ -220,13 +226,13 @@ export default function Navbar() {
                           ৳{totalPrice}
                         </span>
                       </div>
-                        <Link
-                          href="/checkout"
-                          onClick={() => setCartOpen(false)}
-                          className="block text-center w-full bg-blue-600 text-white text-xs py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition shadow-sm"
-                        >
-                          Checkout Now
-                        </Link>
+                      <Link
+                        href="/checkout"
+                        onClick={() => setCartOpen(false)}
+                        className="block text-center w-full bg-blue-600 text-white text-xs py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition shadow-sm"
+                      >
+                        Checkout Now
+                      </Link>
                     </div>
                   )}
                 </div>
@@ -380,6 +386,6 @@ export default function Navbar() {
           )}
         </div>
       )}
-    </nav>
+    </motion.nav>
   );
 }
