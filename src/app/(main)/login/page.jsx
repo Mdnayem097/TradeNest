@@ -217,7 +217,7 @@ export default function LoginPage() {
           type="button"
           disabled={loading}
           onClick={handleGoogleSubmit}
-          className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 py-3 font-medium transition hover:bg-slate-50"
+          className="cursor-pointer flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 py-3 font-medium transition hover:bg-slate-50"
         >
           <FcGoogle size={22} />
           Continue with Google

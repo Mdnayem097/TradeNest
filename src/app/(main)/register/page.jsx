@@ -65,6 +65,12 @@ export default function RegisterPage() {
     }
   };
 
+  const handleGoogleSubmit = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 px-4 py-10 flex items-center justify-center">
       <div className="w-full max-w-md rounded-3xl border border-slate-200/80 bg-white/90 backdrop-blur-xl px-8 py-10 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
@@ -300,7 +306,10 @@ export default function RegisterPage() {
 
         {/* Google */}
         <div className="mt-6">
-          <button className="flex w-full items-center justify-center gap-3 rounded-xl border py-3">
+          <button
+            onClick={handleGoogleSubmit}
+            className="cursor-pointer flex w-full items-center justify-center gap-3 rounded-xl border py-3"
+          >
             <FcGoogle size={22} />
             Continue with Google
           </button>
