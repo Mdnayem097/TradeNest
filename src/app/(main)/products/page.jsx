@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   FiSearch,
   FiGrid,
@@ -15,11 +16,37 @@ import {
 import { authClient } from "@/lib/auth-client";
 
 export default function ProductsPage() {
+  const searchParams = useSearchParams();
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [wishlist, setWishlist] = useState([]);
+
+  /*
+   * ==============================
+   * CATEGORY FROM URL
+   * ==============================
+   */
+
+  const categoryFromUrl = searchParams.get("category");
+
+  /*
+   * If category exists in URL,
+   * use that category.
+   *
+   * Otherwise use manually selected
+   * category from the category buttons.
+   */
+
+  const activeCategory = categoryFromUrl || category;
+
+  /*
+   * ==============================
+   * FETCH PRODUCTS
+   * ==============================
+   */
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -42,7 +69,7 @@ export default function ProductsPage() {
 
         setProducts(productData);
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching products:", error);
         setProducts([]);
       } finally {
         setLoading(false);
@@ -52,8 +79,15 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
+  /*
+   * ==============================
+   * WISHLIST
+   * ==============================
+   */
+
   const handleWishlist = async (product) => {
     const session = await authClient.getSession();
+
     const buyerEmail = session?.data?.user?.email;
 
     if (!buyerEmail) {
@@ -88,13 +122,15 @@ export default function ProductsPage() {
         }
       );
     } catch (error) {
-      console.log(error);
+      console.error("Wishlist error:", error);
     }
   };
 
-  // =========================
-  // CATEGORY LIST
-  // =========================
+  /*
+   * ==============================
+   * GET UNIQUE CATEGORIES
+   * ==============================
+   */
 
   const categories = useMemo(() => {
     const uniqueCategories = [
@@ -108,9 +144,11 @@ export default function ProductsPage() {
     return ["All", ...uniqueCategories];
   }, [products]);
 
-  // =========================
-  // FILTER PRODUCTS
-  // =========================
+  /*
+   * ==============================
+   * FILTER PRODUCTS
+   * ==============================
+   */
 
   const filteredProducts = useMemo(() => {
     const searchValue = search.trim().toLowerCase();
@@ -118,22 +156,41 @@ export default function ProductsPage() {
     return products.filter((product) => {
       const matchesSearch =
         !searchValue ||
-        product?.title?.toLowerCase().includes(searchValue) ||
-        product?.description?.toLowerCase().includes(searchValue) ||
-        product?.category?.toLowerCase().includes(searchValue);
+        product?.title
+          ?.toLowerCase()
+          .includes(searchValue) ||
+        product?.description
+          ?.toLowerCase()
+          .includes(searchValue) ||
+        product?.category
+          ?.toLowerCase()
+          .includes(searchValue);
 
       const matchesCategory =
-        category === "All" ||
+        activeCategory === "All" ||
         product?.category?.toLowerCase() ===
-          category.toLowerCase();
+          activeCategory.toLowerCase();
 
       return matchesSearch && matchesCategory;
     });
-  }, [products, search, category]);
+  }, [products, search, activeCategory]);
 
-  // =========================
-  // LOADING
-  // =========================
+  /*
+   * ==============================
+   * CLEAR FILTERS
+   * ==============================
+   */
+
+  const clearAllFilters = () => {
+    setSearch("");
+    setCategory("All");
+  };
+
+  /*
+   * ==============================
+   * LOADING STATE
+   * ==============================
+   */
 
   if (loading) {
     return (
@@ -141,21 +198,23 @@ export default function ProductsPage() {
         <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-12">
           <div className="animate-pulse">
             <div className="h-8 w-40 rounded-lg bg-neutral-200" />
+
             <div className="mt-4 h-4 w-72 rounded bg-neutral-200" />
 
             <div className="mt-10 h-14 max-w-2xl rounded-2xl bg-neutral-200" />
 
-            <div className="mt-8 flex gap-3">
+            <div className="mt-8 flex gap-3 overflow-hidden">
               {[1, 2, 3, 4].map((item) => (
                 <div
                   key={item}
-                  className="h-10 w-24 rounded-full bg-neutral-200"
+                  className="h-10 w-24 shrink-0 rounded-full bg-neutral-200"
                 />
               ))}
             </div>
           </div>
 
-          <div className="mt-12 grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 xl:grid-cols-4">
+          {/* Mobile: 1 column */}
+          <div className="mt-12 grid grid-cols-1 gap-y-10 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-12 lg:grid-cols-3 xl:grid-cols-4">
             {[...Array(8)].map((_, index) => (
               <div
                 key={index}
@@ -176,21 +235,27 @@ export default function ProductsPage() {
     );
   }
 
+  /*
+   * ==============================
+   * MAIN
+   * ==============================
+   */
+
   return (
     <main className="min-h-screen overflow-hidden bg-[#f7f7f5]">
-      {/* ===================================================== */}
-      {/* HERO */}
-      {/* ===================================================== */}
+      {/* ================= HERO ================= */}
 
       <section className="relative overflow-hidden border-b border-neutral-200/70 bg-white">
-        {/* Decorative background */}
+        {/* Background decoration */}
+
         <div className="pointer-events-none absolute -left-40 -top-40 h-96 w-96 rounded-full bg-blue-100/50 blur-[100px]" />
 
         <div className="pointer-events-none absolute -right-40 top-10 h-96 w-96 rounded-full bg-purple-100/40 blur-[110px]" />
 
         <div className="relative mx-auto max-w-7xl px-5 pb-12 pt-12 sm:px-8 sm:pb-14 lg:px-12 lg:pb-16 lg:pt-16">
           <div className="max-w-3xl">
-            {/* Eyebrow */}
+            {/* Label */}
+
             <div className="mb-5 flex items-center gap-2.5">
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-950 text-white">
                 <FiGrid size={14} />
@@ -202,6 +267,7 @@ export default function ProductsPage() {
             </div>
 
             {/* Heading */}
+
             <h1 className="text-4xl font-black tracking-[-0.045em] text-neutral-950 sm:text-5xl lg:text-6xl">
               Explore
               <span className="text-neutral-400">
@@ -217,6 +283,7 @@ export default function ProductsPage() {
           </div>
 
           {/* Search */}
+
           <div className="relative mt-8 max-w-2xl">
             <FiSearch
               size={19}
@@ -234,6 +301,7 @@ export default function ProductsPage() {
             {search && (
               <button
                 onClick={() => setSearch("")}
+                aria-label="Clear search"
                 className="absolute right-4 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-neutral-100 text-neutral-500 transition-colors hover:bg-neutral-200 hover:text-neutral-950"
               >
                 <FiX size={14} />
@@ -243,14 +311,10 @@ export default function ProductsPage() {
         </div>
       </section>
 
-      {/* ===================================================== */}
-      {/* CONTENT */}
-      {/* ===================================================== */}
+      {/* ================= PRODUCTS SECTION ================= */}
 
       <section className="mx-auto max-w-7xl px-5 py-10 sm:px-8 sm:py-12 lg:px-12 lg:py-16">
-        {/* ================================================= */}
-        {/* TOP BAR */}
-        {/* ================================================= */}
+        {/* Header */}
 
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
@@ -266,7 +330,9 @@ export default function ProductsPage() {
             </div>
 
             <h2 className="mt-2 text-2xl font-black tracking-tight text-neutral-950 sm:text-3xl">
-              All Products
+              {activeCategory === "All"
+                ? "All Products"
+                : activeCategory}
             </h2>
 
             <p className="mt-1 text-sm text-neutral-500">
@@ -290,9 +356,7 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {/* ================================================= */}
-        {/* CATEGORY FILTER */}
-        {/* ================================================= */}
+        {/* ================= CATEGORY FILTER ================= */}
 
         <div className="mt-8">
           <div className="mb-3 flex items-center justify-between">
@@ -300,9 +364,9 @@ export default function ProductsPage() {
               Categories
             </p>
 
-            {category !== "All" && (
+            {activeCategory !== "All" && (
               <button
-                onClick={() => setCategory("All")}
+                onClick={clearAllFilters}
                 className="text-[11px] font-semibold text-neutral-400 transition-colors hover:text-neutral-950"
               >
                 Clear filter
@@ -312,7 +376,7 @@ export default function ProductsPage() {
 
           <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide">
             {categories.map((item) => {
-              const active = category === item;
+              const active = activeCategory === item;
 
               return (
                 <button
@@ -331,41 +395,41 @@ export default function ProductsPage() {
           </div>
         </div>
 
-        {/* ================================================= */}
-        {/* ACTIVE FILTER INFO */}
-        {/* ================================================= */}
+        {/* ================= ACTIVE FILTERS ================= */}
 
-        {(search || category !== "All") && (
+        {(search || activeCategory !== "All") && (
           <div className="mt-7 flex flex-wrap items-center gap-2">
             <span className="text-xs font-medium text-neutral-400">
               Active filters:
             </span>
+
+            {/* Search filter */}
 
             {search && (
               <button
                 onClick={() => setSearch("")}
                 className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-[11px] font-semibold text-neutral-700 shadow-sm ring-1 ring-neutral-200"
               >
-                Search: {search}
+                Search: “{search}”
                 <FiX size={11} />
               </button>
             )}
 
-            {category !== "All" && (
+            {/* Category filter */}
+
+            {activeCategory !== "All" && (
               <button
                 onClick={() => setCategory("All")}
                 className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-[11px] font-semibold text-neutral-700 shadow-sm ring-1 ring-neutral-200"
               >
-                Category: {category}
+                Category: {activeCategory}
                 <FiX size={11} />
               </button>
             )}
           </div>
         )}
 
-        {/* ================================================= */}
-        {/* EMPTY STATE */}
-        {/* ================================================= */}
+        {/* ================= EMPTY STATE ================= */}
 
         {filteredProducts.length === 0 && (
           <div className="mt-10 flex flex-col items-center justify-center rounded-[30px] border border-neutral-200 bg-white px-6 py-20 text-center shadow-sm">
@@ -378,15 +442,12 @@ export default function ProductsPage() {
             </h3>
 
             <p className="mt-2 max-w-sm text-sm leading-6 text-neutral-500">
-              We couldn't find any products matching your
+              We could not find any products matching your
               current search or category filter.
             </p>
 
             <button
-              onClick={() => {
-                setSearch("");
-                setCategory("All");
-              }}
+              onClick={clearAllFilters}
               className="mt-6 rounded-full bg-neutral-950 px-6 py-3 text-xs font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-neutral-800 hover:shadow-lg"
             >
               Clear All Filters
@@ -394,23 +455,21 @@ export default function ProductsPage() {
           </div>
         )}
 
-        {/* ================================================= */}
-        {/* PRODUCT GRID */}
-        {/* ================================================= */}
+        {/* ================= PRODUCT GRID ================= */}
 
         {filteredProducts.length > 0 && (
-          <div className="mt-10 grid grid-cols-1 gap-x-4 gap-y-10 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-12 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="mt-10 grid grid-cols-1 gap-y-10 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-12 lg:grid-cols-3 xl:grid-cols-4">
             {filteredProducts.map((product) => {
-              const isWishlisted = wishlist.includes(
-                product._id
-              );
+              const isWishlisted =
+                wishlist.includes(product._id);
 
               return (
                 <div
                   key={product._id}
                   className="group"
                 >
-                  {/* IMAGE */}
+                  {/* Product Image */}
+
                   <div className="relative aspect-[4/5] overflow-hidden rounded-[28px] bg-neutral-100">
                     <Image
                       src={
@@ -422,14 +481,16 @@ export default function ProductsPage() {
                         "TradeNest Product"
                       }
                       fill
-                      sizes="(max-width: 639px) 50vw, (max-width: 1023px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                      sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, (max-width: 1280px) 33vw, 25vw"
                       className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     />
 
-                    {/* Image Overlay */}
+                    {/* Image overlay */}
+
                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
                     {/* Condition */}
+
                     <div className="absolute left-3 top-3 sm:left-4 sm:top-4">
                       <span className="rounded-full bg-white/90 px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-neutral-800 shadow-sm backdrop-blur-md sm:text-[10px]">
                         {product.condition ||
@@ -438,6 +499,7 @@ export default function ProductsPage() {
                     </div>
 
                     {/* Wishlist */}
+
                     <button
                       onClick={() =>
                         handleWishlist(product)
@@ -459,7 +521,8 @@ export default function ProductsPage() {
                       />
                     </button>
 
-                    {/* View button */}
+                    {/* View Details */}
+
                     <Link
                       href={`/products/${product._id}`}
                       className="absolute bottom-4 right-4 flex h-11 w-11 translate-y-3 items-center justify-center rounded-full bg-white text-neutral-950 opacity-0 shadow-xl transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100"
@@ -468,27 +531,32 @@ export default function ProductsPage() {
                     </Link>
                   </div>
 
-                  {/* CONTENT */}
+                  {/* Product Information */}
+
                   <div className="px-1 pt-5">
                     {/* Category */}
+
                     <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-400">
                       {product.category ||
                         "Category"}
                     </p>
 
                     {/* Title */}
+
                     <h3 className="mt-2 line-clamp-2 text-sm font-bold leading-5 text-neutral-950 transition-colors duration-300 group-hover:text-neutral-600 sm:text-base">
                       {product.title}
                     </h3>
 
                     {/* Description */}
+
                     {product.description && (
                       <p className="mt-1.5 line-clamp-1 text-xs text-neutral-400">
                         {product.description}
                       </p>
                     )}
 
-                    {/* Price + Details */}
+                    {/* Price + Stock */}
+
                     <div className="mt-3 flex items-center justify-between gap-3">
                       <span className="text-base font-black text-neutral-950 sm:text-lg">
                         ৳{product.price}
@@ -504,6 +572,7 @@ export default function ProductsPage() {
                     </div>
 
                     {/* Desktop View Details */}
+
                     <Link
                       href={`/products/${product._id}`}
                       className="group/button mt-4 hidden items-center justify-between border-t border-neutral-100 pt-3 sm:flex"
