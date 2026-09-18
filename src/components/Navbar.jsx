@@ -4,16 +4,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   FiMenu,
   FiX,
-  FiUser,
   FiShoppingCart,
   FiLogOut,
   FiLayout,
   FiSettings,
   FiTrash2,
+  FiArrowUpRight,
 } from "react-icons/fi";
 import { authClient } from "@/lib/auth-client";
 import { useCart } from "@/components/CartContext";
@@ -31,31 +31,49 @@ export default function Navbar() {
 
   const { data: session } = authClient.useSession();
   const user = session?.user;
-  console.log("user", user);
-  const { cartItems, increaseQty, decreaseQty, removeFromCart, totalPrice } =
-    useCart();
+
+  const {
+    cartItems,
+    increaseQty,
+    decreaseQty,
+    removeFromCart,
+    totalPrice,
+  } = useCart();
 
   const isDashboard = pathname?.startsWith("/dashboard");
 
   const handleCartClick = () => {
     if (window.innerWidth >= 1024) {
       setCartOpen((prev) => !prev);
+      setProfileOpen(false);
     } else {
       router.push("/cart");
+      setMobileMenu(false);
     }
   };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target)
+      ) {
         setProfileOpen(false);
       }
-      if (cartRef.current && !cartRef.current.contains(event.target)) {
+
+      if (
+        cartRef.current &&
+        !cartRef.current.contains(event.target)
+      ) {
         setCartOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const handleLogout = async () => {
@@ -72,320 +90,562 @@ export default function Navbar() {
 
   if (isDashboard) return null;
 
-  const getLinkStyle = (path) =>
-    `text-sm font-medium transition-colors duration-200 ${
-      pathname === path
-        ? "text-blue-600"
-        : "text-slate-600 hover:text-slate-900"
-    }`;
+  const navLinks = [
+    { label: "Home", href: "/" },
+    { label: "Products", href: "/products" },
+    { label: "Categories", href: "/categories" },
+    { label: "About", href: "/about" },
+    { label: "Contact", href: "/contact" },
+  ];
 
-  const getMobileLinkStyle = (path) =>
-    `block px-4 py-3 rounded-lg font-medium text-base transition-colors ${
-      pathname === path
-        ? "bg-blue-50 text-blue-600"
-        : "text-slate-700 hover:bg-slate-50"
-    }`;
+  const isActive = (href) => {
+    if (href === "/") {
+      return pathname === "/";
+    }
+
+    return pathname === href || pathname?.startsWith(`${href}/`);
+  };
 
   return (
     <motion.nav
-      className="sticky top-0 z-50 bg-white border-b border-slate-100 shadow-sm"
+      className="sticky top-0 z-50 border-b border-black/[0.06] bg-white/90 backdrop-blur-xl"
       initial={{ y: -80 }}
       animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{
+        duration: 0.5,
+        ease: [0.22, 1, 0.36, 1],
+      }}
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          {/* BRAND LOGO */}
-          <Link href="/" className="flex flex-shrink-0 items-center">
+      <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
+        <div className="flex h-[72px] items-center justify-between">
+          {/* ================= BRAND ================= */}
+          <Link
+            href="/"
+            className="group relative flex shrink-0 items-center"
+          >
             <Image
               src="/TradeNest-Logo.png"
               alt="TradeNest"
-              width={140}
-              height={38}
+              width={150}
+              height={42}
               priority
-              className="h-8 w-auto object-contain"
+              className="h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
             />
           </Link>
 
-          {/* DESKTOP NAV LINKS */}
-          <div className="hidden md:flex items-center gap-6">
-            <Link href="/" className={getLinkStyle("/")}>
-              Home
-            </Link>
-            <Link href="/products" className={getLinkStyle("/products")}>
-              Products
-            </Link>
-            <Link href="/categories" className={getLinkStyle("/categories")}>
-              Categories
-            </Link>
-            <Link href="/about" className={getLinkStyle("/about")}>
-              About
-            </Link>
-            <Link href="/contact" className={getLinkStyle("/contact")}>
-              Contact
-            </Link>
+          {/* ================= DESKTOP NAV ================= */}
+          <div className="hidden items-center gap-1 md:flex">
+            {navLinks.map((link) => {
+              const active = isActive(link.href);
+
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="group relative px-3.5 py-2 text-[13px] font-semibold"
+                >
+                  <span
+                    className={`transition-colors duration-300 ${
+                      active
+                        ? "text-neutral-950"
+                        : "text-neutral-500 group-hover:text-neutral-950"
+                    }`}
+                  >
+                    {link.label}
+                  </span>
+
+                  <span
+                    className={`absolute bottom-0 left-1/2 h-[2px] -translate-x-1/2 rounded-full bg-neutral-950 transition-all duration-300 ${
+                      active
+                        ? "w-5"
+                        : "w-0 group-hover:w-5"
+                    }`}
+                  />
+                </Link>
+              );
+            })}
           </div>
 
-          {/* RIGHT SIDE UTILITIES */}
-          <div className="flex items-center gap-3">
-            {/* CART (Responsive Behavior) */}
-            <div className="relative" ref={cartRef}>
+          {/* ================= RIGHT ACTIONS ================= */}
+          <div className="flex items-center gap-2">
+            {/* ================= CART ================= */}
+            <div
+              className="relative"
+              ref={cartRef}
+            >
               <button
                 onClick={handleCartClick}
-                className="relative p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition focus:outline-none"
+                aria-label="Shopping cart"
+                className="group relative flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-600 transition-all duration-300 hover:-translate-y-0.5 hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-950 hover:shadow-sm"
               >
-                <FiShoppingCart size={20} />
+                <FiShoppingCart
+                  size={18}
+                  strokeWidth={1.8}
+                  className="transition-transform duration-300 group-hover:scale-105"
+                />
+
                 {cartItems.length > 0 && (
-                  <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">
+                  <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full border-2 border-white bg-neutral-950 px-1 text-[9px] font-bold text-white">
                     {cartItems.length}
                   </span>
                 )}
               </button>
 
-              {/* DESKTOP CART MODAL WITH PRODUCT IMAGES */}
-              {cartOpen && (
-                <div className="hidden lg:block absolute right-0 mt-2 w-96 rounded-xl border border-slate-100 bg-white shadow-xl overflow-hidden z-50">
-                  <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
-                    <p className="font-semibold text-slate-800 text-sm">
-                      Shopping Cart ({cartItems.length})
-                    </p>
-                  </div>
+              {/* ================= CART DROPDOWN ================= */}
+              <AnimatePresence>
+                {cartOpen && (
+                  <motion.div
+                    initial={{
+                      opacity: 0,
+                      y: -8,
+                      scale: 0.98,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                      scale: 1,
+                    }}
+                    exit={{
+                      opacity: 0,
+                      y: -8,
+                      scale: 0.98,
+                    }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 top-[52px] hidden w-[390px] overflow-hidden rounded-[24px] border border-neutral-200 bg-white shadow-[0_25px_70px_rgba(0,0,0,0.14)] lg:block"
+                  >
+                    {/* Header */}
+                    <div className="flex items-center justify-between border-b border-neutral-100 px-5 py-4">
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-neutral-400">
+                          Your Cart
+                        </p>
 
-                  <div className="max-h-72 overflow-y-auto p-3 space-y-3">
-                    {cartItems.length === 0 ? (
-                      <p className="text-xs text-slate-400 text-center py-8">
-                        Your cart is empty
-                      </p>
-                    ) : (
-                      cartItems.map((item) => (
-                        <div
-                          key={item._id}
-                          className="flex items-center gap-3 p-2 rounded-xl border border-slate-50 hover:bg-slate-50/50 transition"
-                        >
-                          {/* 1. PRODUCT IMAGE */}
-                          <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-slate-100 border border-slate-200">
-                            <Image
-                              src={item.imageUrl}
-                              fill
-                              sizes="48px"
-                              priority
-                              className="object-cover"
-                              alt={item.title}
-                            />
+                        <h3 className="mt-1 text-sm font-bold text-neutral-950">
+                          Shopping Cart
+                          <span className="ml-1 text-neutral-400">
+                            ({cartItems.length})
+                          </span>
+                        </h3>
+                      </div>
+
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-50 text-neutral-500">
+                        <FiShoppingCart size={16} />
+                      </div>
+                    </div>
+
+                    {/* Products */}
+                    <div className="max-h-[300px] overflow-y-auto p-3">
+                      {cartItems.length === 0 ? (
+                        <div className="px-5 py-12 text-center">
+                          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-neutral-50 text-neutral-400">
+                            <FiShoppingCart size={21} />
                           </div>
 
-                          {/* 2. TITLE & PRICE */}
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-semibold text-slate-800 truncate">
-                              {item.title}
-                            </p>
-                            <p className="text-xs text-blue-600 font-bold mt-0.5">
-                              ৳{item.price}
-                            </p>
-                          </div>
+                          <p className="mt-4 text-sm font-semibold text-neutral-800">
+                            Your cart is empty
+                          </p>
 
-                          {/* 3. QUANTITY CONTROLS */}
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            <div className="flex items-center border border-slate-200 bg-white rounded-md overflow-hidden">
+                          <p className="mt-1 text-xs text-neutral-400">
+                            Add something you love.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {cartItems.map((item) => (
+                            <div
+                              key={item._id}
+                              className="group flex gap-3 rounded-2xl border border-transparent p-2.5 transition-all duration-300 hover:border-neutral-100 hover:bg-neutral-50"
+                            >
+                              {/* Image */}
+                              <div className="relative h-[58px] w-[58px] shrink-0 overflow-hidden rounded-xl bg-neutral-100">
+                                <Image
+                                  src={
+                                    item.imageUrl ||
+                                    "/placeholder.png"
+                                  }
+                                  fill
+                                  sizes="58px"
+                                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                  alt={item.title}
+                                />
+                              </div>
+
+                              {/* Info */}
+                              <div className="min-w-0 flex-1 py-0.5">
+                                <p className="truncate text-xs font-bold text-neutral-900">
+                                  {item.title}
+                                </p>
+
+                                <p className="mt-1 text-xs font-bold text-neutral-950">
+                                  ৳{item.price}
+                                </p>
+
+                                {/* Quantity */}
+                                <div className="mt-2 flex items-center">
+                                  <div className="flex h-7 items-center overflow-hidden rounded-lg border border-neutral-200 bg-white">
+                                    <button
+                                      onClick={() =>
+                                        decreaseQty(item._id)
+                                      }
+                                      className="flex h-full w-7 items-center justify-center text-xs font-bold text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-950"
+                                    >
+                                      −
+                                    </button>
+
+                                    <span className="flex h-full min-w-[28px] items-center justify-center border-x border-neutral-100 text-[10px] font-bold text-neutral-900">
+                                      {item.quantity}
+                                    </span>
+
+                                    <button
+                                      onClick={() =>
+                                        increaseQty(item._id)
+                                      }
+                                      className="flex h-full w-7 items-center justify-center text-xs font-bold text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-950"
+                                    >
+                                      +
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Remove */}
                               <button
-                                onClick={() => decreaseQty(item._id)}
-                                className="px-1.5 py-0.5 bg-slate-50 text-slate-600 text-xs font-bold hover:bg-slate-200 transition"
+                                onClick={() =>
+                                  removeFromCart(item._id)
+                                }
+                                aria-label="Remove item"
+                                className="flex h-7 w-7 shrink-0 items-center justify-center self-start rounded-lg text-neutral-300 transition-all duration-300 hover:bg-red-50 hover:text-red-500"
                               >
-                                -
-                              </button>
-                              <span className="px-2 text-xs font-semibold text-slate-800 min-w-[16px] text-center">
-                                {item.quantity}
-                              </span>
-                              <button
-                                onClick={() => increaseQty(item._id)}
-                                className="px-1.5 py-0.5 bg-slate-50 text-slate-600 text-xs font-bold hover:bg-slate-200 transition"
-                              >
-                                +
+                                <FiTrash2 size={13} />
                               </button>
                             </div>
-
-                            {/* REMOVE BUTTON */}
-                            <button
-                              onClick={() => removeFromCart(item._id)}
-                              className="text-slate-400 hover:text-red-500 p-1 hover:bg-red-50 rounded-md transition"
-                              aria-label="Remove item"
-                            >
-                              <FiTrash2 size={14} />
-                            </button>
-                          </div>
+                          ))}
                         </div>
-                      ))
-                    )}
-                  </div>
-
-                  {cartItems.length > 0 && (
-                    <div className="p-3 border-t border-slate-100 bg-slate-50/50">
-                      <div className="flex justify-between text-xs font-bold text-slate-700 mb-2.5 px-1">
-                        <span>Total:</span>
-                        <span className="text-blue-600 text-sm">
-                          ৳{totalPrice}
-                        </span>
-                      </div>
-                      <Link
-                        href="/checkout"
-                        onClick={() => setCartOpen(false)}
-                        className="block text-center w-full bg-blue-600 text-white text-xs py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition shadow-sm"
-                      >
-                        Checkout Now
-                      </Link>
+                      )}
                     </div>
-                  )}
-                </div>
-              )}
+
+                    {/* Footer */}
+                    {cartItems.length > 0 && (
+                      <div className="border-t border-neutral-100 bg-neutral-50/70 p-4">
+                        <div className="mb-3 flex items-center justify-between">
+                          <span className="text-xs font-medium text-neutral-500">
+                            Total
+                          </span>
+
+                          <span className="text-base font-black text-neutral-950">
+                            ৳{totalPrice}
+                          </span>
+                        </div>
+
+                        <Link
+                          href="/checkout"
+                          onClick={() => setCartOpen(false)}
+                          className="group flex h-11 w-full items-center justify-center gap-2 rounded-full bg-neutral-950 text-xs font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-neutral-800 hover:shadow-lg"
+                        >
+                          Checkout Now
+
+                          <FiArrowUpRight
+                            size={15}
+                            className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                          />
+                        </Link>
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            {/* USER PROFILE */}
+            {/* ================= USER ================= */}
             {!user ? (
-              <div className="hidden sm:flex items-center gap-2">
+              <div className="hidden items-center gap-1.5 sm:flex">
                 <Link
                   href="/login"
-                  className="px-3 py-1.5 text-sm font-medium text-slate-700 hover:text-slate-900"
+                  className="rounded-full px-4 py-2 text-[13px] font-semibold text-neutral-600 transition-all duration-300 hover:bg-neutral-50 hover:text-neutral-950"
                 >
                   Sign In
                 </Link>
+
                 <Link
                   href="/register"
-                  className="px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  className="group flex items-center gap-2 rounded-full bg-neutral-950 px-4 py-2.5 text-[13px] font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-neutral-800 hover:shadow-lg"
                 >
                   Get Started
+
+                  <FiArrowUpRight
+                    size={14}
+                    className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  />
                 </Link>
               </div>
             ) : (
-              <div className="relative" ref={profileRef}>
+              <div
+                className="relative"
+                ref={profileRef}
+              >
                 <button
-                  onClick={() => setProfileOpen(!profileOpen)}
-                  className="flex items-center gap-2 p-1 rounded-full hover:bg-slate-50 transition focus:outline-none"
+                  onClick={() => {
+                    setProfileOpen((prev) => !prev);
+                    setCartOpen(false);
+                  }}
+                  aria-label="Open profile menu"
+                  className="group flex items-center gap-2 rounded-full border border-transparent p-1 transition-all duration-300 hover:border-neutral-200 hover:bg-neutral-50"
                 >
                   {user.image ? (
                     <Image
                       src={user.image}
-                      width={32}
-                      height={32}
-                      className="rounded-full border border-slate-200 object-cover"
+                      width={34}
+                      height={34}
                       priority
+                      className="h-[34px] w-[34px] rounded-full border border-neutral-200 object-cover"
                       alt="Profile"
                     />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-semibold text-sm">
-                      {user.name?.charAt(0).toUpperCase()}
+                    <div className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-neutral-950 text-xs font-bold text-white">
+                      {user.name
+                        ?.charAt(0)
+                        .toUpperCase()}
                     </div>
                   )}
+
+                  <span className="hidden max-w-[90px] truncate pr-1 text-xs font-bold text-neutral-800 lg:block">
+                    {user.name}
+                  </span>
                 </button>
 
-                {profileOpen && (
-                  <div className="absolute right-0 mt-2 w-56 rounded-xl border border-slate-100 bg-white shadow-lg py-1 z-50">
-                    <div className="px-4 py-2.5 border-b border-slate-50">
-                      <p className="text-sm font-semibold text-slate-800 truncate">
-                        {user.name}
-                      </p>
-                      <p className="text-xs text-slate-500 truncate">
-                        {user.email}
-                      </p>
-                    </div>
-                    <Link
-                      href={`/dashboard/${user.role}`}
-                      onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                {/* Profile Dropdown */}
+                <AnimatePresence>
+                  {profileOpen && (
+                    <motion.div
+                      initial={{
+                        opacity: 0,
+                        y: -8,
+                        scale: 0.98,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                      }}
+                      exit={{
+                        opacity: 0,
+                        y: -8,
+                        scale: 0.98,
+                      }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 top-[52px] w-64 overflow-hidden rounded-[22px] border border-neutral-200 bg-white shadow-[0_25px_70px_rgba(0,0,0,0.14)]"
                     >
-                      <FiLayout size={16} className="text-slate-400" />
-                      Dashboard
-                    </Link>
-                    <Link
-                      href="/profile"
-                      onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-                    >
-                      <FiSettings size={16} className="text-slate-400" />
-                      Settings
-                    </Link>
-                    <div className="border-t border-slate-50 my-1" />
-                    <button
-                      onClick={handleLogout}
-                      className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 text-left"
-                    >
-                      <FiLogOut size={16} />
-                      Logout
-                    </button>
-                  </div>
-                )}
+                      {/* User Info */}
+                      <div className="border-b border-neutral-100 px-4 py-4">
+                        <div className="flex items-center gap-3">
+                          {user.image ? (
+                            <Image
+                              src={user.image}
+                              width={40}
+                              height={40}
+                              className="h-10 w-10 rounded-full border border-neutral-200 object-cover"
+                              alt="Profile"
+                            />
+                          ) : (
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-950 text-sm font-bold text-white">
+                              {user.name
+                                ?.charAt(0)
+                                .toUpperCase()}
+                            </div>
+                          )}
+
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-bold text-neutral-950">
+                              {user.name}
+                            </p>
+
+                            <p className="truncate text-[11px] text-neutral-400">
+                              {user.email}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Menu */}
+                      <div className="p-2">
+                        <Link
+                          href={`/dashboard/${user.role}`}
+                          onClick={() =>
+                            setProfileOpen(false)
+                          }
+                          className="group flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-neutral-700 transition-all duration-300 hover:bg-neutral-50 hover:text-neutral-950"
+                        >
+                          <span className="flex items-center gap-3">
+                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-50 text-neutral-500 transition-colors group-hover:bg-white group-hover:text-neutral-950">
+                              <FiLayout size={15} />
+                            </span>
+
+                            Dashboard
+                          </span>
+
+                          <FiArrowUpRight
+                            size={14}
+                            className="text-neutral-300 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-neutral-950"
+                          />
+                        </Link>
+
+                        <Link
+                          href="/profile"
+                          onClick={() =>
+                            setProfileOpen(false)
+                          }
+                          className="group flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-neutral-700 transition-all duration-300 hover:bg-neutral-50 hover:text-neutral-950"
+                        >
+                          <span className="flex items-center gap-3">
+                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-50 text-neutral-500 transition-colors group-hover:bg-white group-hover:text-neutral-950">
+                              <FiSettings size={15} />
+                            </span>
+
+                            Settings
+                          </span>
+
+                          <FiArrowUpRight
+                            size={14}
+                            className="text-neutral-300 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-neutral-950"
+                          />
+                        </Link>
+
+                        <div className="my-1.5 border-t border-neutral-100" />
+
+                        <button
+                          onClick={handleLogout}
+                          className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-red-500 transition-all duration-300 hover:bg-red-50"
+                        >
+                          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 transition-colors group-hover:bg-red-100">
+                            <FiLogOut size={15} />
+                          </span>
+
+                          Logout
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             )}
 
-            {/* MOBILE MENU BUTTON */}
+            {/* ================= MOBILE MENU BUTTON ================= */}
             <button
-              onClick={() => setMobileMenu(!mobileMenu)}
-              className="md:hidden p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition focus:outline-none"
+              onClick={() => {
+                setMobileMenu((prev) => !prev);
+                setProfileOpen(false);
+                setCartOpen(false);
+              }}
+              aria-label="Toggle menu"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-600 transition-all duration-300 hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-950 md:hidden"
             >
-              {mobileMenu ? <FiX size={22} /> : <FiMenu size={22} />}
+              {mobileMenu ? (
+                <FiX size={20} />
+              ) : (
+                <FiMenu size={20} />
+              )}
             </button>
           </div>
         </div>
       </div>
 
-      {/* MOBILE MENU */}
-      {mobileMenu && (
-        <div className="md:hidden border-t border-slate-100 bg-white px-4 py-3 space-y-1 shadow-inner">
-          <Link
-            href="/"
-            onClick={() => setMobileMenu(false)}
-            className={getMobileLinkStyle("/")}
+      {/* ================= MOBILE MENU ================= */}
+      <AnimatePresence>
+        {mobileMenu && (
+          <motion.div
+            initial={{
+              height: 0,
+              opacity: 0,
+            }}
+            animate={{
+              height: "auto",
+              opacity: 1,
+            }}
+            exit={{
+              height: 0,
+              opacity: 0,
+            }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden border-t border-neutral-100 bg-white md:hidden"
           >
-            Home
-          </Link>
-          <Link
-            href="/products"
-            onClick={() => setMobileMenu(false)}
-            className={getMobileLinkStyle("/products")}
-          >
-            Products
-          </Link>
-          <Link
-            href="/categories"
-            onClick={() => setMobileMenu(false)}
-            className={getMobileLinkStyle("/categories")}
-          >
-            Categories
-          </Link>
-          <Link
-            href="/about"
-            onClick={() => setMobileMenu(false)}
-            className={getMobileLinkStyle("/about")}
-          >
-            About
-          </Link>
-          <Link
-            href="/contact"
-            onClick={() => setMobileMenu(false)}
-            className={getMobileLinkStyle("/contact")}
-          >
-            Contact
-          </Link>
+            <div className="mx-auto max-w-7xl px-5 py-4 sm:px-8">
+              <div className="space-y-1">
+                {navLinks.map((link) => {
+                  const active = isActive(link.href);
 
-          {!user && (
-            <div className="pt-4 mt-2 border-t border-slate-100 grid grid-cols-2 gap-2">
-              <Link
-                href="/login"
-                onClick={() => setMobileMenu(false)}
-                className="block text-center py-2 text-sm font-medium text-slate-700 bg-slate-50 rounded-lg"
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMobileMenu(false)}
+                      className={`flex items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-semibold transition-all duration-300 ${
+                        active
+                          ? "bg-neutral-950 text-white"
+                          : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-950"
+                      }`}
+                    >
+                      {link.label}
+
+                      <FiArrowUpRight
+                        size={15}
+                        className={
+                          active
+                            ? "text-white/70"
+                            : "text-neutral-300"
+                        }
+                      />
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {/* Mobile Cart */}
+              <button
+                onClick={() => {
+                  router.push("/cart");
+                  setMobileMenu(false);
+                }}
+                className="mt-3 flex w-full items-center justify-between rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3.5 text-sm font-semibold text-neutral-700 transition-all hover:bg-neutral-100"
               >
-                Sign In
-              </Link>
-              <Link
-                href="/register"
-                onClick={() => setMobileMenu(false)}
-                className="block text-center py-2 text-sm font-medium text-white bg-blue-600 rounded-lg"
-              >
-                Sign Up
-              </Link>
+                <span className="flex items-center gap-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white">
+                    <FiShoppingCart size={16} />
+                  </span>
+
+                  Shopping Cart
+                </span>
+
+                {cartItems.length > 0 && (
+                  <span className="rounded-full bg-neutral-950 px-2.5 py-1 text-[10px] font-bold text-white">
+                    {cartItems.length}
+                  </span>
+                )}
+              </button>
+
+              {/* Mobile Auth */}
+              {!user && (
+                <div className="mt-4 grid grid-cols-2 gap-2 border-t border-neutral-100 pt-4">
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileMenu(false)}
+                    className="flex h-11 items-center justify-center rounded-full border border-neutral-200 text-sm font-bold text-neutral-700 transition-all hover:bg-neutral-50"
+                  >
+                    Sign In
+                  </Link>
+
+                  <Link
+                    href="/register"
+                    onClick={() => setMobileMenu(false)}
+                    className="flex h-11 items-center justify-center rounded-full bg-neutral-950 text-sm font-bold text-white transition-all hover:bg-neutral-800"
+                  >
+                    Get Started
+                  </Link>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.nav>
   );
 }
