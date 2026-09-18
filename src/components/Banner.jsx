@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 const products = [
@@ -73,23 +74,28 @@ const BannerPage = () => {
             </h1>
 
             <p className="mt-7 max-w-lg text-base leading-7 text-neutral-500 sm:text-lg">
-              Discover products from different sellers, explore new styles,
-              and find something made for you.
+              Discover products from different sellers, explore new styles, and
+              find something made for you.
             </p>
 
             {/* CTA */}
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <button className="group inline-flex h-14 items-center justify-center gap-3 rounded-full bg-neutral-950 px-8 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:bg-neutral-800">
+              <Link
+                href="/products"
+                className="group inline-flex h-14 items-center justify-center gap-3 rounded-full bg-neutral-950 px-8 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:bg-neutral-800"
+              >
                 Shop Now
-
                 <span className="transition-transform duration-300 group-hover:translate-x-1">
                   →
                 </span>
-              </button>
+              </Link>
 
-              <button className="h-14 rounded-full border border-neutral-300 bg-white/60 px-8 text-sm font-bold text-neutral-900 backdrop-blur-sm transition-all duration-300 hover:border-neutral-950 hover:bg-white">
+              <Link
+                href="/categories"
+                className="inline-flex h-14 w-full items-center justify-center rounded-full border border-neutral-300 bg-white/60 px-8 text-sm font-bold text-neutral-900 backdrop-blur-sm transition-all duration-300 hover:border-neutral-950 hover:bg-white sm:w-auto group-hover:translate-x-1 hover:-translate-y-1"
+              >
                 Explore Categories
-              </button>
+              </Link>
             </div>
 
             {/* Minimal brand detail */}
