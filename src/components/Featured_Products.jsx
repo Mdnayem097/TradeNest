@@ -80,8 +80,8 @@ const FeaturedProducts = () => {
               TradeNest Collection
             </p>
 
-            <h2 className="text-4xl font-black tracking-tight text-neutral-950 sm:text-5xl lg:text-6xl">
-              Featured Products
+            <h2 className="text-4xl font-black tracking-tight text-[#001E59] sm:text-5xl lg:text-6xl">
+              Featured <span className="text-[#147DFF]">Products</span>
             </h2>
 
             <p className="mt-4 max-w-xl text-sm leading-7 text-neutral-500 sm:text-base">

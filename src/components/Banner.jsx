@@ -67,10 +67,10 @@ const BannerPage = () => {
               Discover • Shop • Enjoy
             </p>
 
-            <h1 className="text-[3.4rem] font-black leading-[0.88] tracking-[-0.055em] text-neutral-950 sm:text-6xl md:text-7xl lg:text-[6.2rem]">
+            <h1 className="text-[3.4rem] font-black leading-[0.88] tracking-[-0.055em] text-[#001E59] sm:text-6xl md:text-7xl lg:text-[6.2rem]">
               Find what
               <br />
-              <span className="text-neutral-400">fits you.</span>
+              <span className="text-[#147DFF]">fits you.</span>
             </h1>
 
             <p className="mt-7 max-w-lg text-base leading-7 text-neutral-500 sm:text-lg">
@@ -82,7 +82,7 @@ const BannerPage = () => {
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/products"
-                className="group inline-flex h-14 items-center justify-center gap-3 rounded-full bg-neutral-950 px-8 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:bg-neutral-800"
+                className="group inline-flex h-14 items-center justify-center gap-3 rounded-full bg-[#001E59] px-8 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[#147DFF]"
               >
                 Shop Now
                 <span className="transition-transform duration-300 group-hover:translate-x-1">
@@ -92,7 +92,7 @@ const BannerPage = () => {
 
               <Link
                 href="/categories"
-                className="inline-flex h-14 w-full items-center justify-center rounded-full border border-neutral-300 bg-white/60 px-8 text-sm font-bold text-neutral-900 backdrop-blur-sm transition-all duration-300 hover:border-neutral-950 hover:bg-white sm:w-auto group-hover:translate-x-1 hover:-translate-y-1"
+                className="inline-flex h-14 w-full items-center justify-center rounded-full border border-neutral-300 bg-[#ffffff] px-8 text-sm font-bold text-neutral-900 backdrop-blur-sm transition-all duration-300 hover:border-neutral-950 hover:bg-[#EAF3FF] sm:w-auto group-hover:translate-x-1 hover:-translate-y-1"
               >
                 Explore Categories
               </Link>

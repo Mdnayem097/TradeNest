@@ -368,7 +368,7 @@ export default function Navbar() {
 
                 <Link
                   href="/register"
-                  className="group flex items-center gap-2 rounded-full bg-neutral-950 px-4 py-2.5 text-[13px] font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-neutral-800 hover:shadow-lg"
+                  className="group flex items-center gap-2 rounded-full bg-[#001E59] px-4 py-2.5 text-[13px] font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#147DFF] hover:shadow-lg"
                 >
                   Get Started
 
@@ -636,7 +636,7 @@ export default function Navbar() {
                   <Link
                     href="/register"
                     onClick={() => setMobileMenu(false)}
-                    className="flex h-11 items-center justify-center rounded-full bg-neutral-950 text-sm font-bold text-white transition-all hover:bg-neutral-800"
+                    className="flex h-11 items-center justify-center rounded-full bg-[#001E59] text-sm font-bold text-white transition-all hover:bg-[#147DFF]"
                   >
                     Get Started
                   </Link>
