@@ -92,7 +92,7 @@ const BannerPage = () => {
 
               <Link
                 href="/categories"
-                className="inline-flex h-14 w-full items-center justify-center rounded-full border border-neutral-300 bg-[#ffffff] px-8 text-sm font-bold text-neutral-900 backdrop-blur-sm transition-all duration-300 hover:border-neutral-950 hover:bg-[#EAF3FF] sm:w-auto group-hover:translate-x-1 hover:-translate-y-1"
+                className="inline-flex h-14 w-full items-center justify-center rounded-full border border-neutral-300 bg-[#ffffff] px-8 text-sm font-bold text-[#001E59] backdrop-blur-sm transition-all duration-300 hover:border-neutral-950 hover:bg-[#E8F1FF] sm:w-auto group-hover:translate-x-1 hover:-translate-y-1"
               >
                 Explore Categories
               </Link>
