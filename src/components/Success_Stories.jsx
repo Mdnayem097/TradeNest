@@ -1,70 +1,134 @@
-import React from 'react';
+"use client";
+
+import React from "react";
+import Link from "next/link";
+import {
+  FiArrowUpRight,
+  FiUsers,
+  FiShoppingBag,
+  FiShield,
+} from "react-icons/fi";
 
 export default function SuccessStories() {
+  const stats = [
+    {
+      value: "12K+",
+      label: "Happy Buyers",
+      icon: <FiUsers />,
+    },
+    {
+      value: "25M+",
+      label: "Successful Deals",
+      icon: <FiShoppingBag />,
+    },
+    {
+      value: "5K+",
+      label: "Verified Sellers",
+      icon: <FiShield />,
+    },
+  ];
+
   return (
-    <section className="w-full px-4 py-8 md:py-12 flex justify-center">
-      <div className="relative w-full max-w-6xl overflow-hidden rounded-2xl bg-[#031c24] text-white shadow-xl">
-        
-        {/* Background Image Container */}
-        <div 
-          className="absolute inset-y-0 right-0 w-full md:w-1/2 bg-cover bg-right bg-no-repeat opacity-30 md:opacity-100 pointer-events-none"
-          style={{ 
-            backgroundImage: "url('/TradeNest-Optinoal-Image.png')",
-            maskImage: 'linear-gradient(to right, transparent, black 50%)',
-            WebkitMaskImage: 'linear-gradient(to right, transparent, black 50%)'
+    <section className="w-full px-4 py-10 sm:px-6 md:py-12 lg:px-8 lg:py-16">
+      <div className="relative mx-auto w-full max-w-7xl overflow-hidden rounded-[28px] bg-[#071b21] text-white shadow-[0_25px_70px_rgba(0,0,0,0.14)] sm:rounded-[34px]">
+
+        {/* Background image */}
+        <div
+          className="absolute inset-y-0 right-0 w-[58%] sm:w-[55%]"
+          style={{
+            backgroundImage:
+              "url('/TradeNest-Optinoal-Image.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center right",
+            maskImage:
+              "linear-gradient(to right, transparent 0%, black 48%, black 100%)",
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent 0%, black 48%, black 100%)",
           }}
         />
 
-        {/* Content Wrapper */}
-        <div className="relative z-10 flex flex-col justify-center p-6 sm:p-10 md:p-14 md:w-3/4 lg:w-2/3">
-          
-          {/* Header */}
-          <h2 className="text-xl sm:text-2xl font-bold tracking-wide text-white">
-            Success Stories
-          </h2>
-          <p className="mt-2 text-xs sm:text-sm text-slate-300 max-w-md leading-relaxed">
-            Discover how our buyers and sellers are thriving, connecting, and creating meaningful impact within our community.
-          </p>
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#071b21] via-[#071b21]/95 to-[#071b21]/15" />
 
-          {/* Mobile Divider (শুধু মোবাইলে দেখাবে) */}
-          <hr className="border-slate-700 my-6 md:hidden" />
+        {/* Soft glow */}
+        <div className="pointer-events-none absolute -right-24 -top-28 h-72 w-72 rounded-full bg-cyan-400/10 blur-[100px]" />
 
-          {/* Stats Grid */}
-          <div className="mt-6 grid grid-cols-1 gap-y-6 sm:grid-cols-3 sm:gap-x-4 md:mt-10">
-            
-            {/* Stat 1 */}
-            <div className="flex flex-col pr-4 sm:border-r border-slate-700/60 last:border-0">
-              <span className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                12K+
-              </span>
-              <span className="mt-1 text-[11px] sm:text-xs font-medium text-slate-400">
-                Happy Buyers
-              </span>
-            </div>
+        <div className="relative z-10 px-6 py-8 sm:px-9 sm:py-10 md:px-12 md:py-12 lg:px-14 lg:py-14">
 
-            {/* Stat 2 */}
-            <div className="flex flex-col pr-4 sm:border-r border-slate-700/60 last:border-0">
-              <span className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                25M+
-              </span>
-              <span className="mt-1 text-[11px] sm:text-xs font-medium text-slate-400">
-                Successful Deals
-              </span>
-            </div>
+          {/* Top label */}
+          <div className="mb-5 flex items-center gap-2.5">
+            <span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-white/10">
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.9)]" />
+            </span>
 
-            {/* Stat 3 */}
-            <div className="flex flex-col">
-              <span className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                5K+
-              </span>
-              <span className="mt-1 text-[11px] sm:text-xs font-medium text-slate-400">
-                Verified Sellers
-              </span>
-            </div>
+            <span className="text-[9px] font-bold uppercase tracking-[0.28em] text-white/45">
+              TradeNest Community
+            </span>
+          </div>
 
+          {/* Heading */}
+          <div className="max-w-xl">
+            <h2 className="text-3xl font-black leading-[1.05] tracking-[-0.035em] sm:text-4xl md:text-[44px]">
+              Real people.
+              <span className="block text-white/45">
+                Real connections.
+              </span>
+            </h2>
+
+            <p className="mt-4 max-w-md text-xs leading-6 text-white/50 sm:text-sm">
+              A marketplace built for people to discover,
+              trade, and connect with confidence.
+            </p>
+          </div>
+
+          {/* Stats */}
+          <div className="mt-7 grid max-w-[680px] grid-cols-3 border-y border-white/10">
+            {stats.map((stat, index) => (
+              <div
+                key={stat.label}
+                className={`group relative px-3 py-4 sm:px-5 sm:py-5 ${
+                  index !== stats.length - 1
+                    ? "border-r border-white/10"
+                    : ""
+                }`}
+              >
+                <div className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.07] text-cyan-200 transition-all duration-300 group-hover:bg-cyan-300/10">
+                  {stat.icon}
+                </div>
+
+                <div className="text-xl font-black tracking-tight sm:text-2xl">
+                  {stat.value}
+                </div>
+
+                <div className="mt-1 text-[9px] font-bold uppercase tracking-[0.12em] text-white/40 sm:text-[10px]">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom CTA */}
+          <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="max-w-sm text-[10px] leading-5 text-white/30 sm:text-xs">
+              Buy, sell, discover and connect — all in one
+              growing marketplace.
+            </p>
+
+            <Link
+              href="/products"
+              className="group inline-flex w-fit items-center gap-2.5 rounded-full bg-white px-4 py-2.5 text-[11px] font-bold text-[#071b21] transition-all duration-300 hover:-translate-y-0.5 hover:bg-cyan-100 hover:shadow-lg"
+            >
+              Explore Marketplace
+
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#071b21] text-white transition-transform duration-300 group-hover:translate-x-1">
+                <FiArrowUpRight size={12} />
+              </span>
+            </Link>
           </div>
         </div>
 
+        {/* Bottom accent */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-300/30 to-transparent" />
       </div>
     </section>
   );
